@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUEST LOG // OPERATIVE SYSTEM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --cyan: #00f5ff;
+    --cyan-dim: #00a8b5;
+    --cyan-glow: rgba(0,245,255,0.15);
+    --orange: #ff6b00;
+    --green: #39ff14;
+    --red: #ff2244;
+    --yellow: #ffd700;
+    --purple: #bf5fff;
+    --bg: #020c10;
+    --bg2: #041520;
+    --panel: rgba(0,20,35,0.85);
+    --border: rgba(0,245,255,0.25);
+    --text: #b0e8f0;
+    --text-dim: #4a8a96;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridPulse 8s ease-in-out infinite;
+  }
+
+  @keyframes gridPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+  .app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border: 1px solid var(--border); background: var(--panel);
+    margin-bottom: 20px; position: relative;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+  }
+  .header::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--cyan), transparent);
+    animation: scanLine 3s linear infinite;
+  }
+  @keyframes scanLine { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+  .logo { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 1.4rem; color: var(--cyan); text-shadow: 0 0 20px var(--cyan), 0 0 40px rgba(0,245,255,.4); letter-spacing: 4px; }
+  .logo span { color: var(--orange); text-shadow: 0 0 20px var(--orange); }
+
+  .header-stats { display: flex; gap: 24px; align-items: center; }
+  .stat-chip { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .stat-chip .label { font-size: .6rem; color: var(--text-dim); letter-spacing: 2px; }
+  .stat-chip .value { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; }
+  .xp-value { color: var(--yellow); text-shadow: 0 0 10px var(--yellow); }
+  .level-value { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+  .complete-value { color: var(--green); text-shadow: 0 0 10px var(--green); }
+
+  .xp-bar-container { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+  .xp-bar-label { display: flex; justify-content: space-between; font-size: .6rem; color: var(--text-dim); letter-spacing: 1px; }
+  .xp-bar { height: 6px; background: rgba(0,245,255,.1); border: 1px solid var(--border); overflow: hidden; }
+  .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); box-shadow: 0 0 8px var(--cyan); transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+  .sys-time { font-size: .65rem; color: var(--text-dim); letter-spacing: 2px; }
+
+  .main { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); padding: 16px; position: relative; }
+  .panel-title { font-family: 'Orbitron', monospace; font-size: .65rem; letter-spacing: 3px; color: var(--cyan-dim); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .panel-title::before { content: '▶'; color: var(--cyan); font-size: .5rem; }
+
+  .corner-tl, .corner-br { position: absolute; width: 10px; height: 10px; border-color: var(--cyan); border-style: solid; opacity: .5; }
+  .corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+  .sidebar { display: flex; flex-direction: column; gap: 14px; }
+
+  .category-list { display: flex; flex-direction: column; gap: 6px; }
+  .cat-btn { background: transparent; border: 1px solid transparent; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: .78rem; padding: 7px 12px; cursor: pointer; text-align: left; letter-spacing: 1px; transition: all .2s; display: flex; align-items: center; justify-content: space-between; }
+  .cat-btn:hover { border-color: var(--border); color: var(--cyan); background: var(--cyan-glow); }
+  .cat-btn.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); text-shadow: 0 0 8px var(--cyan); }
+  .cat-count { font-size: .65rem; color: var(--text-dim); background: rgba(0,245,255,.05); border: 1px solid var(--border); padding: 1px 6px; }
+  .cat-btn.active .cat-count { border-color: var(--cyan); color: var(--cyan); }
+
+  .form-group { margin-bottom: 10px; }
+  .form-label { display: block; font-size: .6rem; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 4px; }
+  .form-input, .form-select, .form-textarea { width: 100%; background: rgba(0,245,255,.03); border: 1px solid var(--border); color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: .78rem; padding: 7px 10px; outline: none; transition: border-color .2s, box-shadow .2s; letter-spacing: .5px; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,245,255,.15), inset 0 0 8px rgba(0,245,255,.05); }
+  .form-textarea { resize: none; height: 56px; }
+  .form-select { cursor: pointer; }
+  .form-select option { background: var(--bg2); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .btn-add { width: 100%; background: transparent; border: 1px solid var(--cyan); color: var(--cyan); font-family: 'Orbitron', monospace; font-size: .7rem; font-weight: 700; letter-spacing: 3px; padding: 10px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; margin-top: 4px; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%); }
+  .btn-add::before { content: ''; position: absolute; inset: 0; left: -100%; background: var(--cyan-glow); transition: left .3s; }
+  .btn-add:hover::before { left: 0; }
+  .btn-add:hover { box-shadow: 0 0 20px rgba(0,245,255,.3); text-shadow: 0 0 10px var(--cyan); }
+
+  .quest-section { display: flex; flex-direction: column; gap: 14px; }
+  .quest-list-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--panel); border: 1px solid var(--border); }
+  .quest-list-title { font-family: 'Orbitron', monospace; font-size: .65rem; letter-spacing: 3px; color: var(--cyan-dim); display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 6px var(--green); animation: blink 1.5s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  .sort-controls { display: flex; gap: 6px; }
+  .sort-btn { background: transparent; border: 1px solid transparent; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: .6rem; padding: 3px 8px; cursor: pointer; letter-spacing: 1px; transition: all .2s; }
+  .sort-btn:hover, .sort-btn.active { border-color: var(--border); color: var(--cyan); }
+
+  .quest-list { display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
+
+  .quest-card { background: var(--panel); border: 1px solid var(--border); padding: 14px 16px; position: relative; transition: border-color .25s, box-shadow .25s; animation: fadeIn .3s ease; clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); }
+  @keyframes fadeIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+  .quest-card:hover { border-color: rgba(0,245,255,.5); background: rgba(0,30,50,.9); box-shadow: 0 0 16px rgba(0,245,255,.08); }
+  .quest-card.completed { opacity: .45; border-color: rgba(57,255,20,.2); }
+  .quest-card.completed .quest-title { text-decoration: line-through; color: var(--text-dim); }
+
+  .quest-card-top { display: flex; align-items: flex-start; gap: 12px; }
+
+  .quest-check { width: 20px; height: 20px; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .quest-check:hover { border-color: var(--green); }
+  .quest-check.checked { border-color: var(--green); background: rgba(57,255,20,.1); }
+  .quest-check.checked::after { content: '✓'; color: var(--green); font-size: .7rem; text-shadow: 0 0 6px var(--green); }
+  .quest-check.partial { border-color: var(--yellow); }
+  .quest-check.partial::after { content: '◐'; color: var(--yellow); font-size: .7rem; }
+
+  .quest-body { flex: 1; min-width: 0; }
+  .quest-title { font-size: .9rem; color: #d0f0f8; margin-bottom: 4px; letter-spacing: .5px; }
+  .quest-desc { font-size: .72rem; color: var(--text-dim); margin-bottom: 8px; line-height: 1.5; }
+
+  .quest-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tag { font-size: .6rem; letter-spacing: 1.5px; padding: 2px 8px; border: 1px solid; }
+  .tag-category { border-color: rgba(0,245,255,.3); color: var(--cyan-dim); background: rgba(0,245,255,.05); }
+  .tag-diff-easy { border-color: rgba(57,255,20,.4); color: var(--green); background: rgba(57,255,20,.05); }
+  .tag-diff-medium { border-color: rgba(255,215,0,.4); color: var(--yellow); background: rgba(255,215,0,.05); }
+  .tag-diff-hard { border-color: rgba(255,107,0,.4); color: var(--orange); background: rgba(255,107,0,.05); }
+  .tag-diff-critical { border-color: rgba(255,34,68,.5); color: var(--red); background: rgba(255,34,68,.05); animation: critPulse 2s ease-in-out infinite; }
+  @keyframes critPulse { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 8px rgba(255,34,68,.4)} }
+  .tag-xp { border-color: rgba(255,215,0,.3); color: var(--yellow); background: rgba(255,215,0,.05); }
+
+  .quest-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .icon-btn { width: 28px; height: 28px; background: transparent; border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; font-size: .75rem; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .icon-btn.del:hover { border-color: var(--red); color: var(--red); box-shadow: 0 0 8px rgba(255,34,68,.2); }
+  .icon-btn.analyze { color: var(--purple); border-color: rgba(191,95,255,.3); }
+  .icon-btn.analyze:hover { border-color: var(--purple); box-shadow: 0 0 10px rgba(191,95,255,.3); }
+  .icon-btn.analyzing { animation: aPulse 1s ease-in-out infinite; border-color: var(--purple); color: var(--purple); pointer-events: none; }
+  @keyframes aPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* SUB-QUESTS */
+  .subquest-container { margin-top: 12px; border-left: 2px solid rgba(191,95,255,.3); padding-left: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .subquest-header { font-size: .6rem; letter-spacing: 2px; color: var(--purple); margin-bottom: 2px; }
+
+  .sub-progress-bar { height: 3px; background: rgba(191,95,255,.1); border: 1px solid rgba(191,95,255,.2); overflow: hidden; margin-bottom: 8px; }
+  .sub-progress-fill { height: 100%; background: linear-gradient(90deg, rgba(191,95,255,.5), var(--purple)); transition: width .5s ease; box-shadow: 0 0 6px var(--purple); }
+  .sub-progress-label { font-size: .58rem; color: rgba(191,95,255,.6); letter-spacing: 1px; margin-bottom: 3px; }
+
+  .subquest-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; background: rgba(191,95,255,.04); border: 1px solid rgba(191,95,255,.15); transition: all .2s; animation: fadeIn .3s ease; }
+  .subquest-item:hover { border-color: rgba(191,95,255,.35); background: rgba(191,95,255,.08); }
+  .subquest-item.done { opacity: .45; }
+  .subquest-item.done .sub-title { text-decoration: line-through; color: var(--text-dim); }
+
+  .sub-check { width: 16px; height: 16px; border: 1px solid rgba(191,95,255,.4); cursor: pointer; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .sub-check:hover { border-color: var(--purple); }
+  .sub-check.checked { border-color: var(--purple); background: rgba(191,95,255,.1); }
+  .sub-check.checked::after { content: '✓'; color: var(--purple); font-size: .6rem; text-shadow: 0 0 6px var(--purple); }
+
+  .sub-body { flex: 1; }
+  .sub-title { font-size: .78rem; color: #c8d8e0; margin-bottom: 3px; }
+  .sub-meta { display: flex; gap: 6px; align-items: center; }
+  .sub-xp { font-size: .58rem; color: rgba(255,215,0,.6); letter-spacing: 1px; }
+  .sub-diff { font-size: .55rem; letter-spacing: 1px; padding: 1px 5px; border: 1px solid; }
+
+  .ai-thinking { padding: 12px; text-align: center; color: var(--purple); font-size: .7rem; letter-spacing: 2px; border: 1px dashed rgba(191,95,255,.3); background: rgba(191,95,255,.03); }
+  .ai-thinking-dots::after { content: ''; animation: dots 1.5s steps(3,end) infinite; }
+  @keyframes dots { 0%{content:''} 33%{content:'.'} 66%{content:'..'} 100%{content:'...'} }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: .75rem; letter-spacing: 2px; border: 1px dashed var(--border); }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: .3; }
+
+  .notif { position: fixed; top: 20px; right: 20px; background: var(--bg2); border: 1px solid var(--cyan); color: var(--cyan); font-family: 'Share Tech Mono', monospace; font-size: .75rem; padding: 10px 18px; letter-spacing: 1px; z-index: 10000; animation: nIn .3s ease, nOut .3s ease 2.3s forwards; box-shadow: 0 0 20px rgba(0,245,255,.2); clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%); }
+  .notif.xp { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 0 20px rgba(255,215,0,.2); }
+  .notif.level { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 30px rgba(0,245,255,.4); font-family: 'Orbitron', monospace; }
+  .notif.ai { border-color: var(--purple); color: var(--purple); box-shadow: 0 0 20px rgba(191,95,255,.2); }
+  .notif.err { border-color: var(--red); color: var(--red); }
+  @keyframes nIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes nOut { from{opacity:1} to{opacity:0} }
+
+  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } .header { flex-wrap: wrap; gap: 12px; } .header-stats { flex-wrap: wrap; gap: 12px; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="logo">QUEST<span>LOG</span> <span style="font-size:.5rem;color:var(--text-dim);letter-spacing:2px">SYS v3.0</span></div>
+    <div class="header-stats">
+      <div class="stat-chip">
+        <span class="label">LEVEL</span>
+        <span class="value level-value" id="level-display">01</span>
+      </div>
+      <div class="xp-bar-container">
+        <div class="xp-bar-label"><span>XP</span><span id="xp-label">0 / 100</span></div>
+        <div class="xp-bar"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+      </div>
+      <div class="stat-chip">
+        <span class="label">COMPLETED</span>
+        <span class="value complete-value" id="complete-count">00</span>
+      </div>
+      <div class="stat-chip">
+        <span class="label">TOTAL XP</span>
+        <span class="value xp-value" id="total-xp">0</span>
+      </div>
+      <span class="sys-time" id="sys-time"></span>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="sidebar">
+      <div class="panel">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-title">FILTER BY CATEGORY</div>
+        <div class="category-list" id="category-list"></div>
+      </div>
+      <div class="panel">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-title">NEW DIRECTIVE</div>
+        <div class="form-group">
+          <label class="form-label">QUEST TITLE *</label>
+          <input class="form-input" id="quest-title" placeholder="Enter objective..." maxlength="60">
+        </div>
+        <div class="form-group">
+          <label class="form-label">DESCRIPTION</label>
+          <textarea class="form-textarea form-input" id="quest-desc" placeholder="Details..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">CATEGORY</label>
+            <select class="form-select" id="quest-cat">
+              <option>MAIN</option><option>SIDE</option><option>DAILY</option>
+              <option>URGENT</option><option>RECON</option><option>BUILD</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">PRIORITY</label>
+            <select class="form-select" id="quest-diff">
+              <option>EASY</option><option>MEDIUM</option><option>HARD</option><option>CRITICAL</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">XP REWARD</label>
+          <select class="form-select" id="quest-xp">
+            <option value="10">10 XP — Minor</option>
+            <option value="25">25 XP — Standard</option>
+            <option value="50">50 XP — Major</option>
+            <option value="100">100 XP — Epic</option>
+            <option value="200">200 XP — Legendary</option>
+          </select>
+        </div>
+        <button class="btn-add" onclick="addQuest()">▶ DEPLOY QUEST</button>
+      </div>
+    </aside>
+
+    <section class="quest-section">
+      <div class="quest-list-header">
+        <div class="quest-list-title"><div class="live-dot"></div>ACTIVE DIRECTIVES</div>
+        <div class="sort-controls">
+          <button class="sort-btn active" id="sort-new" onclick="setSort('new')">NEW</button>
+          <button class="sort-btn" id="sort-diff" onclick="setSort('diff')">PRIORITY</button>
+          <button class="sort-btn" id="sort-xp" onclick="setSort('xp')">XP</button>
+        </div>
+      </div>
+      <div class="quest-list" id="quest-list"></div>
+      <div class="panel" style="margin-top:8px">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-title" style="color:rgba(57,255,20,.5)">▶ COMPLETED OBJECTIVES — <span id="completed-count-label">0</span></div>
+        <div class="quest-list" id="completed-list"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const DIFF_ORDER = { CRITICAL:0, HARD:1, MEDIUM:2, EASY:3 };
+const XP_PER_LEVEL = 100;
+
+let state = (() => {
+  try { return JSON.parse(localStorage.getItem('questlog_v3')) || null; } catch(e) { return null; }
+})() || { quests:[], totalXp:0, level:1, currentXp:0, nextId:1 };
+
+let activeFilter = 'ALL', sortMode = 'new';
+
+const save = () => { try { localStorage.setItem('questlog_v3', JSON.stringify(state)); } catch(e){} };
+
+// Clock
+setInterval(() => {
+  document.getElementById('sys-time').textContent = new Date().toLocaleTimeString('en-GB',{hour12:false});
+}, 1000);
+
+// ===== RENDER =====
+function render() { renderStats(); renderCategories(); renderQuests(); }
+
+function renderStats() {
+  document.getElementById('level-display').textContent = String(state.level).padStart(2,'0');
+  const pct = Math.min((state.currentXp / XP_PER_LEVEL) * 100, 100);
+  document.getElementById('xp-bar-fill').style.width = pct + '%';
+  document.getElementById('xp-label').textContent = `${state.currentXp} / ${XP_PER_LEVEL}`;
+  document.getElementById('total-xp').textContent = state.totalXp;
+  const done = state.quests.filter(q => q.done).length;
+  document.getElementById('complete-count').textContent = String(done).padStart(2,'0');
+  document.getElementById('completed-count-label').textContent = done;
+}
+
+function renderCategories() {
+  const cats = ['ALL','MAIN','SIDE','DAILY','URGENT','RECON','BUILD'];
+  document.getElementById('category-list').innerHTML = cats.map(c => {
+    const n = c==='ALL' ? state.quests.filter(q=>!q.done).length : state.quests.filter(q=>q.category===c&&!q.done).length;
+    return `<button class="cat-btn ${activeFilter===c?'active':''}" onclick="setFilter('${c}')">${c}<span class="cat-count">${n}</span></button>`;
+  }).join('');
+}
+
+function getFiltered(done) {
+  let list = state.quests.filter(q => q.done===done);
+  if (activeFilter!=='ALL' && !done) list = list.filter(q => q.category===activeFilter);
+  if (!done) {
+    if (sortMode==='diff') list.sort((a,b) => DIFF_ORDER[a.difficulty]-DIFF_ORDER[b.difficulty]);
+    else if (sortMode==='xp') list.sort((a,b) => b.xp-a.xp);
+    else list.sort((a,b) => b.id-a.id);
+  }
+  return list;
+}
+
+function diffClass(d) { return 'tag-diff-'+(['easy','medium','hard','critical'].includes((d||'').toLowerCase())?(d||'easy').toLowerCase():'easy'); }
+
+function questCardHTML(q) {
+  const subs = q.subquests||[];
+  const subDone = subs.filter(s=>s.done).length;
+  const hasS = subs.length > 0;
+  const pct = hasS ? Math.round((subDone/subs.length)*100) : 0;
+  const xpEach = hasS ? Math.floor(q.xp/subs.length) : 0;
+  const checkCls = q.done ? 'checked' : (hasS && subDone>0 && subDone<subs.length ? 'partial' : '');
+
+  let subHTML = '';
+  if (q.analyzing) {
+    subHTML = `<div class="subquest-container"><div class="ai-thinking">// AI ANALYZING DIRECTIVE <span class="ai-thinking-dots"></span></div></div>`;
+  } else if (hasS) {
+    subHTML = `<div class="subquest-container">
+      <div class="subquest-header">⬡ SUB-DIRECTIVES (${subDone}/${subs.length})</div>
+      <div class="sub-progress-label">${pct}% COMPLETE</div>
+      <div class="sub-progress-bar"><div class="sub-progress-fill" style="width:${pct}%"></div></div>
+      ${subs.map((s,i) => `<div class="subquest-item ${s.done?'done':''}">
+        <div class="sub-check ${s.done?'checked':''}" onclick="toggleSub(${q.id},${i})"></div>
+        <div class="sub-body">
+          <div class="sub-title">${esc(s.title)}</div>
+          <div class="sub-meta">
+            <span class="sub-diff tag ${diffClass(s.difficulty)}">${s.difficulty||'EASY'}</span>
+            <span class="sub-xp">⬡ ${xpEach} XP</span>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  return `<div class="quest-card ${q.done?'completed':''}" id="card-${q.id}">
+    <div class="quest-card-top">
+      <div class="quest-check ${checkCls}" onclick="toggleQuest(${q.id})"></div>
+      <div class="quest-body">
+        <div class="quest-title">${esc(q.title)}</div>
+        ${q.desc?`<div class="quest-desc">${esc(q.desc)}</div>`:''}
+        <div class="quest-meta">
+          <span class="tag tag-category">${q.category}</span>
+          <span class="tag ${diffClass(q.difficulty)}">${q.difficulty}</span>
+          <span class="tag tag-xp">⬡ ${q.xp} XP</span>
+        </div>
+        ${subHTML}
+      </div>
+      <div class="quest-actions">
+        ${!q.done?`<button class="icon-btn analyze ${q.analyzing?'analyzing':''}" title="AI Breakdown" onclick="analyzeQuest(${q.id})">⬡</button>`:''}
+        <button class="icon-btn del" title="Delete" onclick="deleteQuest(${q.id})">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderQuests() {
+  const active = getFiltered(false);
+  const done = getFiltered(true);
+  document.getElementById('quest-list').innerHTML = active.length
+    ? active.map(questCardHTML).join('')
+    : `<div class="empty-state"><div class="empty-icon">◈</div>NO ACTIVE DIRECTIVES<br><span style="opacity:.5;font-size:.65rem">DEPLOY A NEW QUEST TO BEGIN</span></div>`;
+  document.getElementById('completed-list').innerHTML = done.length
+    ? done.map(questCardHTML).join('')
+    : `<div style="color:var(--text-dim);font-size:.7rem;text-align:center;padding:16px;letter-spacing:2px">NO COMPLETED OBJECTIVES</div>`;
+}
+
+// ===== ACTIONS =====
+function addQuest() {
+  const title = document.getElementById('quest-title').value.trim();
+  if (!title) { notify('// ERROR: TITLE REQUIRED','err'); return; }
+  state.quests.unshift({
+    id: state.nextId++, title,
+    desc: document.getElementById('quest-desc').value.trim(),
+    category: document.getElementById('quest-cat').value,
+    difficulty: document.getElementById('quest-diff').value,
+    xp: parseInt(document.getElementById('quest-xp').value),
+    done: false, subquests: [], analyzing: false
+  });
+  document.getElementById('quest-title').value = '';
+  document.getElementById('quest-desc').value = '';
+  save(); render();
+  notify('// DIRECTIVE DEPLOYED');
+}
+
+function awardXp(amount) {
+  state.totalXp += amount;
+  state.currentXp += amount;
+  while (state.currentXp >= XP_PER_LEVEL) {
+    state.currentXp -= XP_PER_LEVEL;
+    state.level++;
+    const lvl = state.level;
+    setTimeout(() => notify(`// LEVEL UP → LEVEL ${lvl}`, 'level'), 400);
+  }
+}
+
+function toggleQuest(id) {
+  const q = state.quests.find(q => q.id===id);
+  if (!q) return;
+  q.done = !q.done;
+  if (q.done) {
+    (q.subquests||[]).forEach(s => s.done=true);
+    awardXp(q.xp);
+    notify(`// +${q.xp} XP ACQUIRED`, 'xp');
+  } else {
+    state.totalXp = Math.max(0, state.totalXp - q.xp);
+    state.currentXp = Math.max(0, state.currentXp - q.xp);
+  }
+  save(); render();
+}
+
+function toggleSub(questId, idx) {
+  const q = state.quests.find(q => q.id===questId);
+  if (!q || q.done) return;
+  const s = q.subquests[idx];
+  s.done = !s.done;
+  const xpEach = Math.floor(q.xp / q.subquests.length);
+  if (s.done) {
+    awardXp(xpEach);
+    notify(`// +${xpEach} XP ACQUIRED`, 'xp');
+  } else {
+    state.totalXp = Math.max(0, state.totalXp - xpEach);
+    state.currentXp = Math.max(0, state.currentXp - xpEach);
+  }
+  // Auto-complete parent
+  if (q.subquests.every(s => s.done)) {
+    q.done = true;
+    setTimeout(() => notify('// DIRECTIVE COMPLETE — ALL OBJECTIVES MET', 'level'), 300);
+  }
+  save(); render();
+}
+
+function deleteQuest(id) {
+  const q = state.quests.find(q => q.id===id);
+  if (q && q.done) {
+    state.totalXp = Math.max(0, state.totalXp - q.xp);
+    state.currentXp = Math.max(0, state.currentXp - q.xp);
+  }
+  state.quests = state.quests.filter(q => q.id!==id);
+  save(); render();
+  notify('// DIRECTIVE TERMINATED');
+}
+
+function setFilter(cat) { activeFilter = cat; render(); }
+function setSort(mode) {
+  sortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sort-'+mode).classList.add('active');
+  render();
+}
+
+// ===== AI BREAKDOWN =====
+async function analyzeQuest(id) {
+  const q = state.quests.find(q => q.id===id);
+  if (!q || q.analyzing) return;
+  q.analyzing = true; q.subquests = [];
+  save(); render();
+  notify('// AI ANALYZING DIRECTIVE...', 'ai');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content:
+          `You are a tactical mission planner. Break down this quest into 3-5 actionable sub-quests.
+
+Quest: "${q.title}"
+Description: "${q.desc || 'None'}"
+Category: ${q.category} | Priority: ${q.difficulty}
+
+Respond ONLY with a valid JSON array, no markdown, no explanation:
+[{"title":"Sub-quest title","difficulty":"EASY"},{"title":"Another task","difficulty":"MEDIUM"}]
+
+Rules: 3-5 sub-quests, title max 60 chars, difficulty must be EASY/MEDIUM/HARD/CRITICAL, be specific and actionable.`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = (data.content||[]).map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const subs = JSON.parse(raw);
+    if (!Array.isArray(subs) || !subs.length) throw new Error('bad response');
+    q.subquests = subs.slice(0,5).map(s => ({ title: String(s.title).slice(0,60), difficulty: s.difficulty||'EASY', done: false }));
+    q.analyzing = false;
+    save(); render();
+    notify(`// ${q.subquests.length} SUB-DIRECTIVES GENERATED`, 'ai');
+  } catch(err) {
+    q.analyzing = false;
+    save(); render();
+    notify('// AI ANALYSIS FAILED — CHECK CONNECTION', 'err');
+    console.error(err);
+  }
+}
+
+// ===== UTILS =====
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let notifTimer;
+function notify(msg, type='') {
+  document.querySelector('.notif')?.remove();
+  clearTimeout(notifTimer);
+  const el = document.createElement('div');
+  el.className = 'notif' + (type?' '+type:'');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  notifTimer = setTimeout(() => el.remove(), 2600);
+}
+
+document.getElementById('quest-title').addEventListener('keydown', e => { if(e.key==='Enter') addQuest(); });
+
+render();
+</script>
+</body>
+</html>

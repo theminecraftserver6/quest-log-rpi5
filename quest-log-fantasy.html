@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chronicle of Deeds</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --ink:        #1a0e05;
+    --ink-light:  #2e1a0a;
+    --parchment:  #f2e8d0;
+    --parchment2: #e8d9b8;
+    --parchment3: #d4c49a;
+    --aged:       #c4a96a;
+    --aged-dim:   #8a7040;
+    --crimson:    #8b1a1a;
+    --crimson2:   #c0392b;
+    --gold:       #c9860a;
+    --gold-bright:#e8a020;
+    --gold-glow:  rgba(201,134,10,0.2);
+    --emerald:    #1a5c2a;
+    --emerald2:   #2a8c40;
+    --violet:     #4a1a6e;
+    --violet2:    #7b3fa0;
+    --shadow:     rgba(15,8,2,0.6);
+    --text:       #2a1505;
+    --text-dim:   #6b4c28;
+    --text-faint: #9a7a50;
+    --border:     rgba(139,90,30,0.4);
+    --seal-red:   #7a1515;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'IM Fell English', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='4' cy='16' r='2' fill='%23c9860a'/%3E%3Cline x1='4' y1='14' x2='16' y2='2' stroke='%23c9860a' stroke-width='1.5'/%3E%3Cline x1='14' y1='2' x2='18' y2='6' stroke='%23c9860a' stroke-width='1'/%3E%3C/svg%3E") 4 16, auto;
+  }
+
+  /* Parchment texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.6;
+  }
+
+  /* Vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 40%, transparent 50%, rgba(10,5,2,0.7) 100%);
+    pointer-events: none;
+    z-index: 9997;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+
+  /* ═══════════════════════════════════════
+     HEADER / TITLE BANNER
+  ═══════════════════════════════════════ */
+  .header {
+    position: relative;
+    background: linear-gradient(180deg, #2a1a08 0%, #1e1208 60%, #160d06 100%);
+    border: 2px solid var(--aged);
+    margin-bottom: 24px;
+    padding: 20px 28px 18px;
+    overflow: hidden;
+  }
+
+  /* Top ornamental rule */
+  .header::before {
+    content: '✦ ─────────────────────────────────── ✦ ─────────────────────────────────── ✦';
+    position: absolute;
+    top: 8px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--aged);
+    font-size: .55rem;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    opacity: 0.5;
+  }
+
+  /* Bottom ornamental rule */
+  .header::after {
+    content: '✦ ─────────────────────────────────── ✦ ─────────────────────────────────── ✦';
+    position: absolute;
+    bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--aged);
+    font-size: .55rem;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    opacity: 0.5;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 8px 0 4px;
+  }
+
+  .logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--gold-bright);
+    text-shadow: 0 0 30px rgba(232,160,32,.5), 2px 2px 0 rgba(0,0,0,.8);
+    letter-spacing: 2px;
+    line-height: 1.1;
+  }
+
+  .logo-sub {
+    font-family: 'Cinzel', serif;
+    font-size: .65rem;
+    color: var(--aged-dim);
+    letter-spacing: 4px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .stat-chip .label {
+    font-family: 'Cinzel', serif;
+    font-size: .52rem;
+    color: var(--aged-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .stat-chip .value {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .xp-value    { color: var(--gold-bright); text-shadow: 0 0 12px rgba(232,160,32,.6); }
+  .level-value { color: var(--parchment);   text-shadow: 0 0 12px rgba(242,232,208,.4); }
+  .done-value  { color: var(--emerald2);    text-shadow: 0 0 12px rgba(42,140,64,.5); }
+
+  .xp-bar-container { display: flex; flex-direction: column; gap: 4px; min-width: 150px; }
+  .xp-bar-label { display: flex; justify-content: space-between; font-family: 'Cinzel', serif; font-size: .52rem; color: var(--aged-dim); letter-spacing: 1px; }
+  .xp-bar {
+    height: 8px;
+    background: rgba(0,0,0,.5);
+    border: 1px solid var(--aged-dim);
+    position: relative;
+    overflow: hidden;
+  }
+  .xp-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0,0,0,.2) 10px, rgba(0,0,0,.2) 11px);
+  }
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+    box-shadow: 0 0 8px rgba(201,134,10,.6);
+    transition: width .8s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Server status */
+  .server-status { display: flex; align-items: center; gap: 6px; font-family: 'Cinzel', serif; font-size: .52rem; letter-spacing: 1.5px; }
+  .server-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .server-dot.online  { background: var(--emerald2); box-shadow: 0 0 6px var(--emerald2); animation: flicker 3s ease-in-out infinite; }
+  .server-dot.offline { background: var(--crimson);  box-shadow: 0 0 6px var(--crimson); }
+  .server-dot.checking{ background: var(--gold);     box-shadow: 0 0 6px var(--gold); animation: flicker .8s ease-in-out infinite; }
+  .server-label.online  { color: var(--emerald2); }
+  .server-label.offline { color: var(--text-faint); }
+  .server-label.checking{ color: var(--gold); }
+
+  @keyframes flicker {
+    0%,100%{opacity:1} 40%{opacity:.4} 60%{opacity:.9} 80%{opacity:.5}
+  }
+
+  .sys-time { font-family: 'Cinzel', serif; font-size: .58rem; color: var(--aged-dim); letter-spacing: 2px; }
+
+  /* ═══════════════════════════════════════
+     LAYOUT
+  ═══════════════════════════════════════ */
+  .main { display: block; }
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ═══════════════════════════════════════
+     PANELS (parchment cards)
+  ═══════════════════════════════════════ */
+  .panel {
+    background: linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 50%, var(--parchment3) 100%);
+    border: 2px solid var(--aged);
+    padding: 18px 16px;
+    position: relative;
+    box-shadow: inset 0 0 30px rgba(139,90,30,.1), 3px 3px 12px rgba(0,0,0,.5);
+  }
+
+  /* Corner flourishes */
+  .panel::before, .panel::after {
+    font-size: .9rem;
+    color: var(--aged);
+    position: absolute;
+    line-height: 1;
+    opacity: .7;
+  }
+  .panel::before { content: '❧'; top: 4px; left: 6px; }
+  .panel::after  { content: '❧'; bottom: 4px; right: 6px; transform: rotate(180deg); }
+
+  .panel-title {
+    font-family: 'Cinzel', serif;
+    font-size: .72rem;
+    letter-spacing: 3px;
+    color: var(--crimson);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--aged);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,.3);
+  }
+
+  .panel-title::before { content: '⚜'; font-size: .7rem; color: var(--gold); }
+
+  /* ═══════════════════════════════════════
+     CATEGORY FILTER
+  ═══════════════════════════════════════ */
+  .category-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .cat-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: .7rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    text-align: left;
+    letter-spacing: 1px;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 1px;
+  }
+
+  .cat-btn:hover {
+    border-color: var(--aged);
+    color: var(--crimson);
+    background: rgba(139,90,30,.08);
+  }
+
+  .cat-btn.active {
+    border-color: var(--gold);
+    color: var(--crimson);
+    background: rgba(201,134,10,.1);
+    font-weight: 600;
+  }
+
+  .cat-count {
+    font-size: .6rem;
+    color: var(--text-faint);
+    background: rgba(139,90,30,.1);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+  }
+
+  .cat-btn.active .cat-count { border-color: var(--gold); color: var(--gold); }
+
+  /* ═══════════════════════════════════════
+     API PANEL
+  ═══════════════════════════════════════ */
+  .api-panel .api-row { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+  .api-label { font-family: 'Cinzel', serif; font-size: .55rem; letter-spacing: 2px; color: var(--text-faint); text-transform: uppercase; }
+  .api-url {
+    font-size: .65rem;
+    color: var(--crimson);
+    background: rgba(139,90,30,.08);
+    border: 1px solid var(--border);
+    padding: 5px 8px;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    word-break: break-all;
+    font-family: 'Courier New', monospace;
+  }
+  .api-url:hover { border-color: var(--gold); background: var(--gold-glow); }
+  .api-url .copy-hint { font-family: 'Cinzel', serif; font-size: .5rem; color: var(--text-faint); flex-shrink: 0; letter-spacing: 1px; }
+  .api-divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .api-note { font-size: .65rem; color: var(--text-dim); line-height: 1.7; font-style: italic; }
+  .api-note code { font-style: normal; color: var(--crimson); background: rgba(139,90,30,.08); padding: 0 4px; font-family: 'Courier New', monospace; }
+
+  /* ═══════════════════════════════════════
+     FORM
+  ═══════════════════════════════════════ */
+  .form-group { margin-bottom: 10px; }
+  .form-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: .58rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: rgba(255,255,255,.4);
+    border: 1px solid var(--aged);
+    border-bottom: 2px solid var(--aged-dim);
+    color: var(--ink);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: .85rem;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--gold);
+    border-bottom-color: var(--gold);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.1), 0 0 8px rgba(201,134,10,.2);
+    background: rgba(255,255,255,.6);
+  }
+
+  .form-textarea { resize: none; height: 58px; }
+  .form-select { cursor: pointer; }
+  .form-select option { background: var(--parchment); color: var(--ink); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .btn-add {
+    width: 100%;
+    background: linear-gradient(180deg, var(--crimson) 0%, #6a1010 100%);
+    border: 2px solid var(--gold);
+    color: var(--gold-bright);
+    font-family: 'Cinzel', serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+    margin-top: 6px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  }
+
+  .btn-add::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,.1) 0%, transparent 50%);
+    transition: opacity .2s;
+  }
+
+  .btn-add:hover {
+    background: linear-gradient(180deg, #a02020 0%, #801010 100%);
+    box-shadow: 0 2px 16px rgba(139,26,26,.5), 0 0 20px rgba(201,134,10,.2);
+    transform: translateY(-1px);
+  }
+
+  .btn-add:active { transform: translateY(0); }
+
+  /* ═══════════════════════════════════════
+     QUEST BOARD HEADER
+  ═══════════════════════════════════════ */
+  .quest-section { display: flex; flex-direction: column; gap: 14px; }
+
+  .quest-list-header {
+    background: linear-gradient(180deg, #2a1a08 0%, #1e1208 100%);
+    border: 2px solid var(--aged);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .quest-list-title {
+    font-family: 'Cinzel', serif;
+    font-size: .75rem;
+    letter-spacing: 3px;
+    color: var(--gold-bright);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--emerald2);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--emerald2);
+    animation: flicker 2s ease-in-out infinite;
+  }
+
+  .sort-controls { display: flex; gap: 6px; }
+  .sort-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--aged-dim);
+    font-family: 'Cinzel', serif;
+    font-size: .58rem;
+    padding: 3px 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all .2s;
+    text-transform: uppercase;
+  }
+  .sort-btn:hover, .sort-btn.active {
+    border-color: var(--aged);
+    color: var(--gold-bright);
+  }
+
+  .quest-list { display: flex; flex-direction: column; gap: 10px; min-height: 60px; }
+
+  /* ═══════════════════════════════════════
+     QUEST CARD
+  ═══════════════════════════════════════ */
+  .quest-card {
+    background: linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 60%, var(--parchment3) 100%);
+    border: 2px solid var(--aged);
+    border-left: 5px solid var(--aged);
+    padding: 14px 16px;
+    position: relative;
+    transition: all .25s;
+    animation: unfurl .35s ease;
+    box-shadow: 2px 3px 10px rgba(0,0,0,.4), inset 0 0 20px rgba(139,90,30,.06);
+  }
+
+  @keyframes unfurl {
+    from { opacity: 0; transform: translateY(-8px) scaleY(.95); transform-origin: top; }
+    to   { opacity: 1; transform: translateY(0) scaleY(1); }
+  }
+
+  .quest-card:hover {
+    border-color: var(--gold);
+    box-shadow: 2px 3px 16px rgba(0,0,0,.5), 0 0 20px rgba(201,134,10,.1), inset 0 0 20px rgba(201,134,10,.05);
+    transform: translateX(2px);
+  }
+
+  .quest-card.completed {
+    opacity: .5;
+    background: linear-gradient(160deg, #ddd0b0 0%, #cfc0a0 100%);
+    border-left-color: var(--emerald);
+    filter: sepia(.3);
+  }
+
+  .quest-card.completed .quest-title { text-decoration: line-through; color: var(--text-faint); }
+
+  /* Priority left-border colors */
+  .quest-card[data-diff="EASY"]     { border-left-color: var(--emerald); }
+  .quest-card[data-diff="MEDIUM"]   { border-left-color: var(--gold); }
+  .quest-card[data-diff="HARD"]     { border-left-color: var(--crimson); }
+  .quest-card[data-diff="CRITICAL"] { border-left-color: var(--violet2); animation: unfurl .35s ease, urgentPulse 2s ease-in-out infinite .35s; }
+
+  @keyframes urgentPulse {
+    0%,100% { border-left-color: var(--violet2); }
+    50%     { border-left-color: #bf00ff; box-shadow: 2px 3px 10px rgba(0,0,0,.4), -3px 0 12px rgba(127,0,255,.3); }
+  }
+
+  .quest-card-top { display: flex; align-items: flex-start; gap: 12px; }
+
+  /* Wax seal checkbox */
+  .quest-check {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--aged-dim);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    background: rgba(255,255,255,.3);
+    font-size: .75rem;
+    color: transparent;
+  }
+
+  .quest-check:hover { border-color: var(--gold); background: var(--gold-glow); color: var(--gold); }
+  .quest-check:hover::after { content: '✓'; color: var(--gold); }
+
+  .quest-check.checked {
+    background: radial-gradient(circle, var(--seal-red) 0%, #5a0f0f 100%);
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(122,21,21,.5);
+  }
+  .quest-check.checked::after { content: '✦'; color: var(--gold-bright); font-size: .6rem; }
+
+  .quest-check.partial {
+    background: radial-gradient(circle, var(--gold) 0%, #8a5500 100%);
+    border-color: var(--gold-bright);
+  }
+  .quest-check.partial::after { content: '◐'; color: var(--parchment); font-size: .65rem; }
+
+  .quest-body { flex: 1; min-width: 0; }
+
+  .quest-title {
+    font-family: 'Cinzel', serif;
+    font-size: .92rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+
+  .quest-desc {
+    font-size: .8rem;
+    color: var(--text-dim);
+    margin-bottom: 9px;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .quest-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
+  .tag {
+    font-family: 'Cinzel', serif;
+    font-size: .55rem;
+    letter-spacing: 1.5px;
+    padding: 2px 8px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+
+  .tag-category { border-color: var(--aged-dim); color: var(--text-dim); background: rgba(139,90,30,.08); }
+
+  .tag-diff-easy     { border-color: var(--emerald);  color: var(--emerald2); background: rgba(26,92,42,.08); }
+  .tag-diff-medium   { border-color: var(--gold);     color: var(--gold);     background: rgba(201,134,10,.08); }
+  .tag-diff-hard     { border-color: var(--crimson);  color: var(--crimson2); background: rgba(139,26,26,.08); }
+  .tag-diff-critical { border-color: var(--violet2);  color: var(--violet2);  background: rgba(74,26,110,.08); }
+
+  .tag-xp { border-color: var(--gold); color: var(--gold); background: rgba(201,134,10,.08); }
+  .tag-daily  { border-color: var(--emerald); color: var(--emerald2); background: rgba(26,92,42,.06); animation: renewPulse 3s ease-in-out infinite; cursor: help; }
+  .tag-weekly { border-color: var(--violet2); color: var(--violet2); background: rgba(74,26,110,.07); animation: renewPulse 4s ease-in-out infinite; cursor: help; }
+  @keyframes renewPulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+
+  .quest-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .icon-btn {
+    width: 28px; height: 28px;
+    background: rgba(139,90,30,.1);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: .75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    border-radius: 50%;
+  }
+
+  .icon-btn.del:hover { border-color: var(--crimson); color: var(--crimson); background: rgba(139,26,26,.1); }
+  .icon-btn.analyze { color: var(--violet2); border-color: rgba(123,63,160,.3); }
+  .icon-btn.analyze:hover { border-color: var(--violet2); background: rgba(74,26,110,.1); color: var(--violet2); }
+  .icon-btn.analyzing { animation: orbPulse 1.2s ease-in-out infinite; border-color: var(--violet2); color: var(--violet2); pointer-events: none; }
+
+  @keyframes orbPulse {
+    0%,100% { box-shadow: 0 0 4px rgba(123,63,160,.3); }
+    50%     { box-shadow: 0 0 12px rgba(123,63,160,.7); }
+  }
+
+  /* ═══════════════════════════════════════
+     SUB-QUESTS
+  ═══════════════════════════════════════ */
+  .subquest-container {
+    margin-top: 12px;
+    border-left: 3px solid var(--aged);
+    padding-left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .subquest-header {
+    font-family: 'Cinzel', serif;
+    font-size: .58rem;
+    letter-spacing: 2px;
+    color: var(--violet2);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .subquest-header::before { content: '✧'; color: var(--gold); }
+
+  .sub-progress-bar {
+    height: 4px;
+    background: rgba(139,90,30,.15);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 8px;
+    border-radius: 2px;
+  }
+
+  .sub-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--violet), var(--violet2));
+    transition: width .5s ease;
+    box-shadow: 0 0 6px rgba(123,63,160,.5);
+  }
+
+  .sub-progress-label {
+    font-family: 'Cinzel', serif;
+    font-size: .55rem;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+
+  .subquest-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 10px;
+    background: rgba(139,90,30,.06);
+    border: 1px solid var(--border);
+    transition: all .2s;
+    animation: unfurl .3s ease;
+  }
+
+  .subquest-item:hover { border-color: var(--aged); background: rgba(139,90,30,.12); }
+  .subquest-item.done { opacity: .5; }
+  .subquest-item.done .sub-title { text-decoration: line-through; color: var(--text-faint); font-style: italic; }
+
+  .sub-check {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--aged-dim);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    background: rgba(255,255,255,.3);
+    font-size: .55rem;
+  }
+
+  .sub-check:hover { border-color: var(--violet2); }
+  .sub-check.checked { background: radial-gradient(circle, var(--violet), #3a0a5e); border-color: var(--violet2); }
+  .sub-check.checked::after { content: '✦'; color: var(--parchment); font-size: .45rem; }
+
+  .sub-body { flex: 1; }
+  .sub-title { font-size: .8rem; color: var(--ink-light); margin-bottom: 3px; line-height: 1.4; }
+  .sub-meta { display: flex; gap: 6px; align-items: center; }
+  .sub-xp { font-family: 'Cinzel', serif; font-size: .55rem; color: var(--gold); letter-spacing: 1px; }
+  .sub-diff { font-family: 'Cinzel', serif; font-size: .5rem; letter-spacing: 1px; padding: 1px 6px; border: 1px solid; text-transform: uppercase; }
+
+  /* Scrying orb animation for AI thinking */
+  .ai-thinking {
+    padding: 14px;
+    text-align: center;
+    color: var(--violet2);
+    font-family: 'Cinzel', serif;
+    font-size: .68rem;
+    letter-spacing: 2px;
+    border: 1px dashed rgba(123,63,160,.3);
+    background: rgba(74,26,110,.05);
+    font-style: italic;
+  }
+
+  .ai-thinking-dots::after {
+    content: '';
+    animation: inkDots 1.8s steps(3,end) infinite;
+  }
+  @keyframes inkDots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:'.'} }
+
+  /* ═══════════════════════════════════════
+     COMPLETED SECTION
+  ═══════════════════════════════════════ */
+  .completed-panel {
+    background: linear-gradient(160deg, #d0c4a4 0%, #c4b890 100%);
+    border: 2px solid var(--aged-dim);
+    padding: 18px 16px;
+    position: relative;
+    box-shadow: inset 0 0 30px rgba(0,0,0,.08), 3px 3px 12px rgba(0,0,0,.4);
+    filter: sepia(.15);
+  }
+
+  .completed-panel::before { content: '❧'; font-size: .9rem; color: var(--aged-dim); position: absolute; top: 4px; left: 6px; opacity: .5; }
+  .completed-panel::after  { content: '❧'; font-size: .9rem; color: var(--aged-dim); position: absolute; bottom: 4px; right: 6px; transform: rotate(180deg); opacity: .5; }
+
+  .completed-panel .panel-title { color: var(--emerald); border-bottom-color: rgba(26,92,42,.3); }
+  .completed-panel .panel-title::before { content: '✦'; color: var(--emerald2); }
+
+  /* ═══════════════════════════════════════
+     EMPTY STATE
+  ═══════════════════════════════════════ */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-faint);
+    font-size: .8rem;
+    font-style: italic;
+    border: 2px dashed var(--border);
+    background: rgba(242,232,208,.3);
+  }
+
+  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: .3; display: block; }
+
+  /* ═══════════════════════════════════════
+     NOTIFICATIONS (scroll unfurling)
+  ═══════════════════════════════════════ */
+  .notif {
+    position: fixed;
+    top: 20px; right: 20px;
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment2) 100%);
+    border: 2px solid var(--gold);
+    color: var(--ink);
+    font-family: 'Cinzel', serif;
+    font-size: .7rem;
+    padding: 10px 18px;
+    letter-spacing: 1px;
+    z-index: 10000;
+    animation: scrollIn .35s ease, scrollOut .3s ease 2.3s forwards;
+    box-shadow: 3px 3px 12px rgba(0,0,0,.5), 0 0 20px rgba(201,134,10,.15);
+    text-transform: uppercase;
+  }
+
+  .notif::before { content: '⚜ '; color: var(--gold); }
+
+  .notif.xp     { border-color: var(--gold);    color: var(--text); }
+  .notif.xp::before { color: var(--gold-bright); }
+  .notif.level  { border-color: var(--crimson); color: var(--crimson); font-family: 'Cinzel Decorative', serif; font-size: .75rem; box-shadow: 3px 3px 12px rgba(0,0,0,.5), 0 0 30px rgba(201,134,10,.3); }
+  .notif.ai     { border-color: var(--violet2); color: var(--violet); }
+  .notif.ai::before { color: var(--violet2); content: '✧ '; }
+  .notif.err    { border-color: var(--crimson2); color: var(--crimson2); }
+  .notif.err::before { content: '⚠ '; }
+
+  .notif.sync { border-color: var(--emerald); color: var(--emerald2); }
+  .notif.sync::before { content: '↺ '; color: var(--emerald2); }
+
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .header-stats { flex-wrap: wrap; gap: 12px; }
+  }
+
+  /* ── MOBILE DRAWER TOGGLE ──────────────────────────── */
+  .mobile-menu-btn {
+    display: none;
+    position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--parchment2); border: 2px solid var(--gold);
+    color: var(--crimson); font-size: 1.2rem; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,.5), 0 0 12px rgba(201,134,10,.2);
+    align-items: center; justify-content: center;
+    transition: all .2s; font-family: serif;
+  }
+  .mobile-menu-btn:active { transform: scale(.93); }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 998;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay.active { display: block; }
+
+  /* ── DESKTOP ────────────────────────────────────────── */
+  @media (min-width: 701px) {
+    .main { display: grid; grid-template-columns: 290px 1fr; gap: 18px; }
+  }
+
+  /* ── MOBILE ─────────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .app { padding: 10px 10px 20px; }
+
+    /* Header */
+    .header { padding: 14px 16px 12px; margin-bottom: 12px; }
+    .header::before, .header::after { display: none; }
+    .header-inner { flex-direction: column; align-items: stretch; gap: 8px; padding: 0; }
+    .logo { font-size: 1.1rem; }
+    .logo-sub { font-size: .55rem; }
+    .header-stats { flex-wrap: wrap; gap: 8px 14px; }
+    .stat-chip .label { font-size: .55rem; }
+    .stat-chip .value { font-size: .9rem; }
+    .xp-bar-container { min-width: 110px; flex: 1; }
+    .sys-time { display: none; }
+    .server-label { display: none; }
+    .server-status { gap: 0; }
+
+    /* Auth user bar in header */
+    .auth-user-bar { flex-wrap: wrap; gap: 6px; }
+
+    /* Sidebar — off-canvas drawer */
+    .main { display: block; }
+    .sidebar {
+      position: fixed; top: 0; left: -100%; z-index: 999;
+      width: min(320px, 90vw); height: 100dvh;
+      overflow-y: auto; padding: 20px 16px 80px;
+      background: linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 60%, var(--parchment3) 100%);
+      border-right: 2px solid var(--aged);
+      transition: left .3s cubic-bezier(.4,0,.2,1);
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 4px 0 24px rgba(0,0,0,.5);
+    }
+    .sidebar.open { left: 0; }
+
+    .mobile-menu-btn { display: flex; }
+
+    /* Push notif above FAB */
+    .notif { bottom: 84px; }
+
+    /* Quest section */
+    .quest-section { min-width: 0; }
+
+    /* Quest cards — bigger targets */
+    .quest-card { padding: 12px 14px; }
+    .quest-card-top { gap: 10px; }
+    .quest-check { width: 28px; height: 28px; flex-shrink: 0; }
+    .quest-check.checked::after,
+    .quest-check.partial::after { font-size: .9rem; }
+    .quest-title { font-size: .85rem; }
+    .quest-actions { display: flex; flex-direction: row; gap: 6px; flex-shrink: 0; }
+    .icon-btn { width: 36px; height: 36px; font-size: .85rem; }
+    .quest-meta { flex-wrap: wrap; gap: 4px; }
+
+    /* Sort controls */
+    .sort-btn { padding: 7px 10px; font-size: .65rem; }
+    .quest-list-header { padding: 8px 12px; }
+
+    /* Forms */
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .form-input, .form-select, .form-textarea { font-size: .88rem; padding: 10px 12px; }
+    .form-textarea { height: 64px; }
+    .btn-add { padding: 13px; font-size: .68rem; }
+    .coop-toggle-btn { padding: 10px; }
+
+    /* Auth box */
+    .auth-box {
+      width: min(360px, 94vw);
+      padding: 28px 18px 22px;
+      margin: 12px;
+    }
+    .auth-field input { font-size: 1rem; padding: 10px 12px; }
+    .auth-submit { padding: 13px; font-size: .68rem; }
+
+    /* Friends */
+    .invite-row { flex-wrap: wrap; }
+    .invite-in { min-width: 0; }
+    .coop-add-row { flex-wrap: wrap; }
+    .coop-sel { min-width: 0; }
+  }
+
+  /* ── FRIENDS & CO-OP (fantasy) ─────────────────────── */
+  .friend-list    { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .friend-empty   { font-size:.68rem; color:var(--text-faint); text-align:center; padding:10px; font-style:italic; }
+  .friend-row     { display:flex; align-items:center; gap:8px; padding:6px 8px; border-bottom:1px solid var(--aged-dim); background:rgba(201,134,10,.03); }
+  .friend-info    { display:flex; flex-direction:column; min-width:72px; }
+  .friend-name    { font-family:'Cinzel',serif; font-size:.72rem; color:var(--crimson); }
+  .friend-level   { font-size:.58rem; color:var(--text-faint); font-style:italic; }
+  .friend-xp-bar-wrap { flex:1; display:flex; align-items:center; gap:6px; }
+  .friend-xp-bar  { flex:1; height:5px; background:rgba(201,134,10,.1); border:1px solid var(--aged-dim); overflow:hidden; border-radius:2px; }
+  .friend-xp-fill { height:100%; background:var(--gold); transition:width .6s ease; }
+  .friend-xp-fill.xp-updated { animation: xpFlash .6s ease; }
+  @keyframes xpFlash { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 12px rgba(201,134,10,.5)} }
+  .friend-xp-num  { font-size:.58rem; color:var(--gold); min-width:52px; text-align:right; font-style:italic; }
+  .friend-remove-btn { background:transparent; border:none; color:var(--text-faint); cursor:pointer; font-size:.7rem; }
+  .friend-remove-btn:hover { color:var(--crimson); }
+
+  .invite-section { display:flex; flex-direction:column; gap:7px; }
+  .invite-row     { display:flex; gap:6px; align-items:center; }
+  .invite-gen-btn { flex:1; background:rgba(201,134,10,.07); border:1px solid var(--aged); color:var(--crimson); font-family:'Cinzel',serif; font-size:.58rem; padding:6px 8px; cursor:pointer; letter-spacing:1px; transition:all .2s; }
+  .invite-gen-btn:hover { background:rgba(201,134,10,.14); }
+  .invite-code    { font-family:'Cinzel',serif; font-size:.85rem; color:var(--gold-bright); letter-spacing:4px; cursor:pointer; padding:4px 8px; border:1px solid var(--aged-dim); min-width:90px; text-align:center; transition:all .2s; }
+  .invite-code:not(:empty):hover { border-color:var(--gold); background:rgba(201,134,10,.08); }
+  .invite-in      { flex:1; font-size:.72rem; padding:6px 8px; }
+  .invite-accept-btn { background:rgba(139,26,26,.08); border:1px solid var(--crimson2); color:var(--crimson); font-family:'Cinzel',serif; font-size:.58rem; padding:6px 10px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .invite-accept-btn:hover { background:rgba(139,26,26,.15); }
+
+  .coop-section   { display:flex; flex-direction:column; gap:10px; }
+  .coop-empty     { color:var(--text-faint); font-size:.7rem; text-align:center; padding:14px; font-style:italic; border:1px dashed var(--aged-dim); }
+  .coop-card      { background:rgba(139,26,26,.04); border:1px solid rgba(139,26,26,.25); border-left:4px solid var(--crimson); padding:12px 14px; }
+  .coop-card.coop-updated { animation: coopFlash .6s ease; }
+  @keyframes coopFlash { 0%,100%{border-color:rgba(139,26,26,.25)} 50%{border-color:var(--crimson);box-shadow:0 0 12px rgba(139,26,26,.2)} }
+  .coop-card.all-done { opacity:.45; border-left-color:var(--emerald); }
+  .coop-card-top  { display:flex; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .coop-body      { flex:1; }
+  .coop-title     { font-family:'Cinzel',serif; font-size:.82rem; color:var(--crimson); margin-bottom:3px; }
+  .coop-desc      { font-size:.72rem; color:var(--text-dim); margin-bottom:6px; font-style:italic; }
+  .coop-meta-tags { display:flex; gap:5px; flex-wrap:wrap; }
+  .coop-tag       { border-color:rgba(139,26,26,.4); color:var(--crimson2); background:rgba(139,26,26,.05); }
+  .quest-location { display:flex; align-items:center; gap:5px; font-size:.7rem; color:var(--text-dim); margin-top:3px; font-style:italic; }
+  .quest-location::before { content:'📍'; font-style:normal; font-size:.8rem; }
+  .quest-location a { color:var(--text-dim); text-decoration:none; }
+  .quest-location a:hover { color:var(--crimson); text-decoration:underline; }
+
+  /* Manual sub-quest form */
+  .sub-add-form {
+    display: none; align-items: center; gap: 6px;
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px dashed var(--aged-dim);
+  }
+  .sub-add-input {
+    flex: 1; background: rgba(201,134,10,.04); border: 1px solid var(--aged-dim);
+    color: var(--ink); font-family: 'IM Fell English', serif;
+    font-size: .78rem; padding: 5px 8px; outline: none; min-width: 0;
+    transition: border-color .2s;
+  }
+  .sub-add-input:focus { border-color: var(--gold); }
+  .sub-add-input::placeholder { color: var(--text-faint); font-style: italic; }
+  .sub-add-diff {
+    background: rgba(201,134,10,.05); border: 1px solid var(--aged-dim);
+    color: var(--text-dim); font-family: 'Cinzel', serif;
+    font-size: .6rem; padding: 5px 4px; outline: none; cursor: pointer;
+    flex-shrink: 0;
+  }
+  .sub-add-confirm {
+    background: rgba(201,134,10,.1); border: 1px solid var(--aged);
+    color: var(--crimson); font-family: 'Cinzel', serif; font-size: .6rem;
+    letter-spacing: 1px; padding: 5px 10px; cursor: pointer;
+    flex-shrink: 0; transition: all .2s; white-space: nowrap;
+  }
+  .sub-add-confirm:hover { background: rgba(201,134,10,.2); }
+  .sub-del-btn {
+    background: transparent; border: none; color: var(--text-faint);
+    cursor: pointer; font-size: .65rem; padding: 2px 4px; flex-shrink: 0;
+    opacity: 0; transition: opacity .15s, color .15s;
+  }
+  .subquest-item:hover .sub-del-btn { opacity: 1; }
+  .sub-del-btn:hover { color: var(--crimson); }
+  .coop-actions   { display:flex; gap:5px; flex-direction:column; align-items:flex-end; }
+  .coop-done-btn  { background:rgba(201,134,10,.1); border:1px solid var(--gold); color:var(--gold-bright); font-family:'Cinzel',serif; font-size:.6rem; padding:4px 10px; cursor:pointer; transition:all .2s; }
+  .coop-done-btn:hover { background:rgba(201,134,10,.2); }
+  .coop-progress  { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .coop-progress-bar  { flex:1; height:5px; background:rgba(201,134,10,.1); border:1px solid var(--aged-dim); overflow:hidden; border-radius:2px; }
+  .coop-progress-fill { height:100%; background:var(--gold); transition:width .5s ease; }
+  .coop-progress-label{ font-size:.6rem; color:var(--text-faint); white-space:nowrap; font-style:italic; }
+  .coop-members   { display:flex; flex-direction:column; gap:3px; }
+  .coop-member-status { display:flex; align-items:center; gap:6px; font-size:.66rem; color:var(--text-dim); }
+  .coop-member-status.done { color:var(--text-faint); text-decoration:line-through; }
+  .coop-dot       { width:6px; height:6px; border-radius:50%; background:var(--aged-dim); flex-shrink:0; }
+  .coop-dot.done  { background:var(--emerald2); }
+  .coop-member-xp-tag { margin-left:auto; color:var(--gold); font-size:.58rem; }
+
+  .coop-toggle-btn{ width:100%; background:rgba(139,26,26,.06); border:1px solid rgba(139,26,26,.3); color:var(--crimson); font-family:'Cinzel',serif; font-size:.6rem; padding:7px; cursor:pointer; letter-spacing:1px; transition:all .2s; margin-bottom:4px; }
+  .coop-toggle-btn:hover { background:rgba(139,26,26,.12); }
+  #coop-form-wrap { display:none; }
+  #coop-form-wrap.active { display:block; }
+  .coop-form-area { display:flex; flex-direction:column; gap:5px; margin-bottom:8px; }
+  .coop-member-row{ display:flex; align-items:center; gap:6px; padding:5px 8px; background:rgba(139,26,26,.04); border:1px solid rgba(139,26,26,.15); font-size:.7rem; }
+  .coop-member-name{ flex:1; color:var(--crimson); font-family:'Cinzel',serif; }
+  .coop-member-xp { color:var(--gold); font-size:.65rem; }
+  .coop-remove-btn{ background:transparent; border:none; color:var(--text-faint); cursor:pointer; }
+  .coop-remove-btn:hover { color:var(--crimson); }
+  .coop-add-row   { display:flex; gap:5px; align-items:center; }
+  .coop-sel       { flex:1; font-size:.7rem; padding:5px; }
+  .coop-xp-in     { width:64px; font-size:.7rem; padding:5px; }
+  .coop-add-btn   { background:rgba(201,134,10,.08); border:1px solid var(--aged); color:var(--crimson); font-family:'Cinzel',serif; font-size:.58rem; padding:5px 9px; cursor:pointer; white-space:nowrap; }
+  .coop-add-btn:hover { background:rgba(201,134,10,.15); }
+
+  /* ── LOGIN OVERLAY ─────────────────────────────────── */
+  .auth-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    animation: authAppear .5s ease;
+  }
+  .auth-overlay.hidden { display: none; }
+  @keyframes authAppear { from{opacity:0} to{opacity:1} }
+
+  .auth-box {
+    width: 380px;
+    background: linear-gradient(160deg, var(--parchment) 0%, var(--parchment2) 60%, var(--parchment3) 100%);
+    border: 3px solid var(--aged);
+    padding: 36px 32px 28px;
+    position: relative;
+    box-shadow: inset 0 0 40px rgba(139,90,30,.1), 6px 6px 24px rgba(0,0,0,.7);
+  }
+  .auth-box::before { content: '❧'; font-size: 1rem; color: var(--aged); position: absolute; top: 6px; left: 8px; opacity:.5; }
+  .auth-box::after  { content: '❧'; font-size: 1rem; color: var(--aged); position: absolute; bottom: 6px; right: 8px; transform:rotate(180deg); opacity:.5; }
+
+  .auth-logo {
+    font-family: 'Cinzel Decorative', serif; font-weight: 900;
+    font-size: 1.3rem; color: var(--gold-bright);
+    text-shadow: 0 0 20px rgba(232,160,32,.4), 2px 2px 0 rgba(0,0,0,.3);
+    text-align: center; margin-bottom: 3px; letter-spacing: 1px;
+  }
+  .auth-sub {
+    text-align: center; font-family: 'Cinzel', serif;
+    font-size: .58rem; color: var(--text-faint);
+    letter-spacing: 3px; margin-bottom: 26px; font-style: italic;
+  }
+  .auth-rule {
+    text-align: center; color: var(--aged); font-size: .7rem;
+    margin-bottom: 20px; opacity: .5; letter-spacing: 2px;
+  }
+
+  .auth-tabs {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--aged); margin-bottom: 22px;
+  }
+  .auth-tab {
+    background: transparent; border: none;
+    color: var(--text-faint); font-family: 'Cinzel', serif;
+    font-size: .62rem; letter-spacing: 2px; padding: 8px;
+    cursor: pointer; transition: all .2s; text-transform: uppercase;
+  }
+  .auth-tab.active {
+    background: rgba(201,134,10,.1); color: var(--crimson);
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .auth-field { margin-bottom: 14px; }
+  .auth-field label {
+    display: block; font-family: 'Cinzel', serif;
+    font-size: .56rem; letter-spacing: 2px;
+    color: var(--text-dim); margin-bottom: 4px; text-transform: uppercase;
+  }
+  .auth-field input {
+    width: 100%; background: rgba(255,255,255,.5);
+    border: 1px solid var(--aged); border-bottom: 2px solid var(--aged-dim);
+    color: var(--ink); font-family: 'IM Fell English', serif;
+    font-size: .9rem; padding: 8px 10px; outline: none;
+    transition: border-color .2s;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
+  }
+  .auth-field input:focus { border-color: var(--gold); border-bottom-color: var(--gold); }
+
+  .auth-submit {
+    width: 100%;
+    background: linear-gradient(180deg, var(--crimson) 0%, #6a1010 100%);
+    border: 2px solid var(--gold); color: var(--gold-bright);
+    font-family: 'Cinzel', serif; font-size: .68rem;
+    font-weight: 700; letter-spacing: 3px; padding: 11px;
+    cursor: pointer; transition: all .2s; margin-top: 6px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  }
+  .auth-submit:hover { background: linear-gradient(180deg, #a02020 0%, #801010 100%); transform: translateY(-1px); }
+  .auth-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .auth-error {
+    color: var(--crimson2); font-family: 'Cinzel', serif;
+    font-size: .62rem; letter-spacing: 1px;
+    margin-top: 10px; text-align: center; min-height: 1.2em;
+    font-style: italic;
+  }
+
+  .auth-user-bar { display: flex; align-items: center; gap: 12px; }
+  .auth-username {
+    font-family: 'Cinzel', serif; font-size: .65rem;
+    color: var(--gold-bright); letter-spacing: 2px;
+  }
+  .auth-username::before { content: '⚜ '; color: var(--gold); }
+  .auth-logout {
+    background: transparent; border: 1px solid rgba(139,26,26,.4);
+    color: var(--crimson); font-family: 'Cinzel', serif;
+    font-size: .55rem; padding: 3px 10px; cursor: pointer;
+    letter-spacing: 1px; transition: all .2s; text-transform: uppercase;
+  }
+  .auth-logout:hover { border-color: var(--crimson); background: rgba(139,26,26,.08); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ── AUTH OVERLAY ─────────────────────────────────────── -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">The Chronicle of Deeds</div>
+    <div class="auth-sub">✦ &nbsp; Identify Thyself, Adventurer &nbsp; ✦</div>
+    <div class="auth-rule">— ✦ —</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="showTab('login')">Enter</button>
+      <button class="auth-tab" id="tab-register" onclick="showTab('register')">Enlist</button>
+    </div>
+    <div class="auth-field">
+      <label>Adventurer's Name</label>
+      <input type="text" id="auth-username" placeholder="your name..." autocomplete="username" maxlength="32">
+    </div>
+    <div class="auth-field">
+      <label>Secret Passphrase</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" maxlength="128">
+    </div>
+    <div class="auth-field hidden" id="auth-confirm-wrap">
+      <label>Confirm Passphrase</label>
+      <input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password" maxlength="128">
+    </div>
+    <button class="auth-submit" id="auth-submit" onclick="submitAuth()">⚜ Enter the Hall</button>
+    <div class="auth-error" id="auth-error"></div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- Mobile sidebar toggle -->
+  <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- HEADER BANNER -->
+  <header class="header">
+    <div class="header-inner">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="logo">The Chronicle of Deeds</div>
+        <span class="logo-sub">✦ &nbsp; Royal Registry of Adventurers &nbsp; ✦</span>
+        <div class="auth-user-bar">
+          <span class="auth-username" id="header-username"></span>
+          <button class="auth-logout" onclick="logout()">Depart</button>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-chip">
+          <span class="label">Rank</span>
+          <span class="value level-value" id="level-display">I</span>
+        </div>
+        <div class="xp-bar-container">
+          <div class="xp-bar-label">
+            <span>Glory</span>
+            <span id="xp-label">0 / 100</span>
+          </div>
+          <div class="xp-bar"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Deeds Done</span>
+          <span class="value done-value" id="complete-count">0</span>
+        </div>
+        <div class="stat-chip">
+          <span class="label">Total Glory</span>
+          <span class="value xp-value" id="total-xp">0</span>
+        </div>
+        <div class="server-status">
+          <div class="server-dot checking" id="srv-dot"></div>
+          <span class="server-label checking" id="srv-label">Seeking...</span>
+        </div>
+        <span class="sys-time" id="sys-time"></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- Category Filter -->
+      <div class="panel">
+        <div class="panel-title">Filter by Guild</div>
+        <div class="category-list" id="category-list"></div>
+      </div>
+
+      <!-- API Panel -->
+      <div class="panel api-panel">
+        <div class="panel-title">Arcane Conduit</div>
+        <div class="api-row">
+          <span class="api-label">Glory Scroll</span>
+          <div class="api-url" onclick="copyUrl(this, '/api/xp')">
+            <span id="api-xp-url">http://localhost:8080/api/xp</span>
+            <span class="copy-hint">COPY</span>
+          </div>
+        </div>
+        <div class="api-row">
+          <span class="api-label">Quest Registry</span>
+          <div class="api-url" onclick="copyUrl(this, '/api/quests')">
+            <span id="api-quests-url">http://localhost:8080/api/quests</span>
+            <span class="copy-hint">COPY</span>
+          </div>
+        </div>
+        <div class="api-divider"></div>
+        <div class="api-note">
+          Both tomes support <code>GET</code>.<br>
+          The Glory Scroll updates when quests change.<br>
+          Data is also inscribed to <code>xp_state.json</code>.
+        </div>
+      </div>
+
+      <!-- New Quest Form -->
+      <div class="panel">
+        <div class="panel-title">Post a New Quest</div>
+        <div class="form-group">
+          <label class="form-label">Quest Title *</label>
+          <input class="form-input" id="quest-title" placeholder="Name thy deed..." maxlength="60">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea form-input" id="quest-desc" placeholder="Speak of the task..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Guild</label>
+            <select class="form-select" id="quest-cat">
+              <option>MAIN</option>
+              <option>SIDE</option>
+              <option>DAILY</option>
+              <option>WEEKLY</option>
+              <option>URGENT</option>
+              <option>RECON</option>
+              <option>BUILD</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Peril</label>
+            <select class="form-select" id="quest-diff">
+              <option>EASY</option>
+              <option>MEDIUM</option>
+              <option>HARD</option>
+              <option>CRITICAL</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Glory Reward</label>
+          <select class="form-select" id="quest-xp">
+            <option value="10">10 — Petty Deed</option>
+            <option value="25">25 — Common Deed</option>
+            <option value="50">50 — Noble Deed</option>
+            <option value="100">100 — Heroic Deed</option>
+            <option value="200">200 — Legendary Deed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">📍 Location <span style="color:var(--text-faint);font-size:.75em;font-style:italic">(optional)</span></label>
+          <input class="form-input" id="quest-location" placeholder="Where must thou venture?" maxlength="80">
+        </div>
+        <button class="coop-toggle-btn" onclick="toggleCoopMode()">⚔ Toggle Fellowship Quest</button>
+        <div id="coop-form-wrap">
+          <div class="form-label" style="margin-bottom:6px;color:var(--crimson)">Fellows &amp; Glory Shares</div>
+          <div id="coop-form-area" class="coop-form-area"></div>
+          <button class="btn-add" id="coop-deploy-btn" style="display:none;background:rgba(139,26,26,.08);border-color:var(--crimson2);color:var(--crimson)" onclick="createCoopQuest()">⚔ Post Fellowship Quest</button>
+        </div>
+        <button class="btn-add" id="solo-deploy-btn" onclick="addQuest()">⚜ Post to the Board</button>
+      </div>
+
+      <!-- Fellows Panel -->
+      <div class="panel">
+        <div class="panel-title">⚔ Fellowship</div>
+        <div id="friends-panel-body"></div>
+      </div>
+    </aside>
+
+    <!-- QUEST BOARD -->
+    <section class="quest-section">
+      <div class="quest-list-header">
+        <div class="quest-list-title">
+          <div class="live-dot"></div>
+          Active Quests
+        </div>
+        <div class="sort-controls">
+          <button class="sort-btn active" id="sort-new" onclick="setSort('new')">Recent</button>
+          <button class="sort-btn" id="sort-diff" onclick="setSort('diff')">Peril</button>
+          <button class="sort-btn" id="sort-xp" onclick="setSort('xp')">Glory</button>
+        </div>
+      </div>
+      <div class="quest-list" id="quest-list"></div>
+
+      <!-- Co-op Quests -->
+      <div class="completed-panel" style="border-left-color:var(--crimson);margin-top:10px">
+        <div class="panel-title" style="color:var(--crimson)">⚔ Fellowship Quests</div>
+        <div class="coop-section"><div id="coop-list"><div class="coop-empty">No fellowship quests yet.</div></div></div>
+      </div>
+
+      <!-- Completed -->
+      <div class="completed-panel">
+        <div class="panel-title">Deeds of Legend — <span id="completed-count-label">0</span> completed</div>
+        <div class="quest-list" id="completed-list"></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X',
+  'XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX',
+  'XXI','XXII','XXIII','XXIV','XXV','XXVI','XXVII','XXVIII','XXIX','XXX'];
+function toRoman(n) { return ROMAN[n] || String(n); }
+
+const SERVER_BASE = (window.location.port && window.location.hostname !== '')
+  ? window.location.origin : 'http://localhost:8080';
+
+const DIFF_ORDER  = { CRITICAL:0, HARD:1, MEDIUM:2, EASY:3 };
+const XP_PER_LEVEL = 100;
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const TOKEN_KEY = 'questlog_token';
+const USER_KEY  = 'questlog_username';
+const QUEST_KEY = 'questlog_fantasy';
+
+let authToken    = localStorage.getItem(TOKEN_KEY) || null;
+let authUsername = localStorage.getItem(USER_KEY)  || null;
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` };
+}
+
+function showTab(tab) {
+  const isReg = tab === 'register';
+  document.getElementById('tab-login').classList.toggle('active', !isReg);
+  document.getElementById('tab-register').classList.toggle('active', isReg);
+  document.getElementById('auth-confirm-wrap').classList.toggle('hidden', !isReg);
+  document.getElementById('auth-submit').textContent = isReg ? '⚜ Join the Registry' : '⚜ Enter the Hall';
+  document.getElementById('auth-error').textContent = '';
+}
+
+async function submitAuth() {
+  const btn      = document.getElementById('auth-submit');
+  const errEl    = document.getElementById('auth-error');
+  const username = document.getElementById('auth-username').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const confirm  = document.getElementById('auth-confirm').value;
+  const isReg    = document.getElementById('tab-register').classList.contains('active');
+
+  errEl.textContent = '';
+  if (!username || !password) { errEl.textContent = 'Thy name and passphrase are required.'; return; }
+  if (isReg && password !== confirm) { errEl.textContent = 'The passphrases do not match.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '⌛ Consulting the registry...';
+
+  try {
+    const res  = await fetch(`${SERVER_BASE}/api/${isReg ? 'register' : 'login'}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'The registry refused thy entry.'; return; }
+
+    authToken    = data.token;
+    authUsername = data.username;
+    localStorage.setItem(TOKEN_KEY, authToken);
+    localStorage.setItem(USER_KEY, authUsername);
+    document.getElementById('auth-overlay').classList.add('hidden');
+    document.getElementById('header-username').textContent = authUsername;
+    await initApp();
+
+  } catch(e) {
+    errEl.textContent = 'The tavern is unreachable — is server.py running?';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = document.getElementById('tab-register').classList.contains('active')
+      ? '⚜ Join the Registry' : '⚜ Enter the Hall';
+  }
+}
+
+async function logout() {
+  try {
+    await fetch(`${SERVER_BASE}/api/logout`, { method:'POST', headers: authHeaders() });
+  } catch(e){}
+  authToken = null; authUsername = null;
+  localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);
+  xp    = { level:1, currentXp:0, totalXp:0 };
+  state = { quests:[], nextId:1, lastDailyReset: null, lastWeeklyReset: null };
+  document.getElementById('auth-overlay').classList.remove('hidden');
+  document.getElementById('auth-error').textContent = '';
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-confirm').value  = '';
+  showTab('login');
+}
+
+['auth-username','auth-password','auth-confirm'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') submitAuth(); });
+});
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let xp    = { level:1, currentXp:0, totalXp:0 };
+let state = { quests:[], nextId:1, lastDailyReset: null, lastWeeklyReset: null };
+let activeFilter = 'ALL', sortMode = 'new', serverOnline = false;
+
+function saveLocal() {
+  try { localStorage.setItem(QUEST_KEY, JSON.stringify(state)); } catch(e){}
+}
+
+// ── Daily & Weekly Reset ──────────────────────────────────────────────────────
+function todayStamp() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function weekStamp() {
+  const d = new Date();
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() + 1 - day);
+  return `${d.getFullYear()}-W${String(Math.ceil(d.getDate() / 7)).padStart(2,'0')}-${d.getMonth()}`;
+}
+
+function runDailyReset() {
+  const today = todayStamp();
+  if (state.lastDailyReset === today) return;
+  let n = 0;
+  state.quests.forEach(q => {
+    if (q.category !== 'DAILY' || !q.done) return;
+    q.done = false;
+    (q.subquests || []).forEach(s => s.done = false);
+    q.analyzing = false;
+    n++;
+  });
+  state.lastDailyReset = today;
+  save();
+  if (n > 0) setTimeout(() => notify(`The daily rites are renewed — ${n} deed${n>1?'s':''} reset. Glory is kept.`, 'sync'), 300);
+}
+
+function runWeeklyReset() {
+  const week = weekStamp();
+  if (state.lastWeeklyReset === week) return;
+  let n = 0;
+  state.quests.forEach(q => {
+    if (q.category !== 'WEEKLY' || !q.done) return;
+    q.done = false;
+    (q.subquests || []).forEach(s => s.done = false);
+    q.analyzing = false;
+    n++;
+  });
+  state.lastWeeklyReset = week;
+  save();
+  if (n > 0) setTimeout(() => notify(`The weekly chronicles turn — ${n} deed${n>1?'s':''} renewed. Glory is kept.`, 'sync'), 500);
+}
+
+// ── Server sync ───────────────────────────────────────────────────────────────
+async function pushXp() {
+  if (!serverOnline || !authToken) return;
+  try {
+    await fetch(`${SERVER_BASE}/api/xp`, {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ level: xp.level, currentXp: xp.currentXp,
+        totalXp: xp.totalXp, xpToNextLevel: XP_PER_LEVEL,
+        completedQuests: state.quests.filter(q=>q.done).length })
+    });
+  } catch(e){}
+}
+
+async function pushQuests() {
+  if (!serverOnline || !authToken) return;
+  try {
+    await fetch(`${SERVER_BASE}/api/quests`, {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify(state.quests)
+    });
+  } catch(e){}
+}
+
+const save = () => { saveLocal(); syncAll(); };
+function syncAll() { pushXp(); pushQuests(); }
+
+async function loadFromServer() {
+  try {
+    const [xpRes, qRes] = await Promise.all([
+      fetch(`${SERVER_BASE}/api/xp`,     { headers: authHeaders() }),
+      fetch(`${SERVER_BASE}/api/quests`, { headers: authHeaders() })
+    ]);
+    if (xpRes.status === 401 || qRes.status === 401) { logout(); return; }
+    if (xpRes.ok) {
+      const data = await xpRes.json();
+      xp = { level: data.level||1, currentXp: data.currentXp||0, totalXp: data.totalXp||0 };
+    }
+    if (qRes.ok) {
+      const quests = await qRes.json();
+      if (Array.isArray(quests) && quests.length) {
+        state.quests = quests;
+        state.nextId = Math.max(...quests.map(q=>q.id||0), 0) + 1;
+      }
+    }
+  } catch(e) {}
+}
+
+async function checkServer() {
+  const dot = document.getElementById('srv-dot');
+  const lbl = document.getElementById('srv-label');
+  if (!authToken) return;
+  try {
+    const r = await fetch(`${SERVER_BASE}/api/xp`, {signal: AbortSignal.timeout(2000), headers: authHeaders()});
+    if (r.ok) {
+      serverOnline = true;
+      dot.className = 'server-dot online'; lbl.className = 'server-label online'; lbl.textContent = 'Tavern Online';
+      updateApiUrls(); return;
+    }
+    if (r.status === 401) { logout(); return; }
+  } catch(e){}
+  serverOnline = false;
+  dot.className = 'server-dot offline'; lbl.className = 'server-label offline'; lbl.textContent = 'Tavern Closed';
+}
+
+function updateApiUrls() {
+  document.getElementById('api-xp-url').textContent     = `${SERVER_BASE}/api/xp`;
+  document.getElementById('api-quests-url').textContent = `${SERVER_BASE}/api/quests`;
+}
+
+async function initApp() {
+  serverOnline = true;
+  document.getElementById('header-username').textContent = authUsername;
+  try {
+    const cached = JSON.parse(localStorage.getItem(QUEST_KEY));
+    if (cached) { state = cached; }
+  } catch(e) {}
+  await loadFromServer();
+  runDailyReset();
+  runWeeklyReset();
+  render();
+  checkServer();
+  setInterval(checkServer, 15000);
+  scheduleNextMidnight();
+  loadFriendsData();
+}
+
+(async () => {
+  if (authToken) {
+    try {
+      const r = await fetch(`${SERVER_BASE}/api/me`, { headers: authHeaders() });
+      if (r.ok) {
+        const data = await r.json();
+        authUsername = data.username;
+        localStorage.setItem(USER_KEY, authUsername);
+        document.getElementById('auth-overlay').classList.add('hidden');
+        await initApp();
+        return;
+      }
+    } catch(e) {}
+    authToken = null; authUsername = null;
+    localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);
+  }
+})();
+
+function scheduleNextMidnight() {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+  setTimeout(() => {
+    runDailyReset();
+    runWeeklyReset();
+    render();
+    syncAll();
+    scheduleNextMidnight();
+  }, midnight - now);
+}
+
+// ── Clock ─────────────────────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('sys-time').textContent =
+    new Date().toLocaleTimeString('en-GB', {hour12:false});
+}, 1000);
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() { renderStats(); renderCategories(); renderQuests(); }
+
+function renderStats() {
+  document.getElementById('level-display').textContent = toRoman(xp.level);
+  const pct = Math.min((xp.currentXp / XP_PER_LEVEL) * 100, 100);
+  document.getElementById('xp-bar-fill').style.width = pct + '%';
+  document.getElementById('xp-label').textContent = `${xp.currentXp} / ${XP_PER_LEVEL}`;
+  document.getElementById('total-xp').textContent  = xp.totalXp;
+  const done = state.quests.filter(q=>q.done).length;
+  document.getElementById('complete-count').textContent       = done;
+  document.getElementById('completed-count-label').textContent = done;
+}
+
+function renderCategories() {
+  const cats = ['ALL','MAIN','SIDE','DAILY','WEEKLY','URGENT','RECON','BUILD'];
+  document.getElementById('category-list').innerHTML = cats.map(c => {
+    const n = c==='ALL'
+      ? state.quests.filter(q=>!q.done).length
+      : state.quests.filter(q=>q.category===c&&!q.done).length;
+    return `<button class="cat-btn ${activeFilter===c?'active':''}" onclick="setFilter('${c}')">
+      ${c}<span class="cat-count">${n}</span>
+    </button>`;
+  }).join('');
+}
+
+function getFiltered(done) {
+  let list = state.quests.filter(q=>q.done===done);
+  if (activeFilter!=='ALL' && !done) list = list.filter(q=>q.category===activeFilter);
+  if (!done) {
+    if (sortMode==='diff') list.sort((a,b)=>DIFF_ORDER[a.difficulty]-DIFF_ORDER[b.difficulty]);
+    else if (sortMode==='xp') list.sort((a,b)=>b.xp-a.xp);
+    else list.sort((a,b)=>b.id-a.id);
+  }
+  return list;
+}
+
+function diffClass(d) {
+  const dl = (d||'').toLowerCase();
+  return 'tag-diff-'+(['easy','medium','hard','critical'].includes(dl)?dl:'easy');
+}
+
+function questCardHTML(q) {
+  const subs     = q.subquests||[];
+  const subDone  = subs.filter(s=>s.done).length;
+  const hasS     = subs.length > 0;
+  const pct      = hasS ? Math.round((subDone/subs.length)*100) : 0;
+  const xpEach   = hasS ? Math.floor(q.xp/subs.length) : 0;
+  const checkCls = q.done ? 'checked' : (hasS && subDone>0 && subDone<subs.length ? 'partial' : '');
+
+  let subHTML = '';
+  if (q.analyzing) {
+    subHTML = `<div class="subquest-container">
+      <div class="ai-thinking">The oracle peers into the ether<span class="ai-thinking-dots"></span></div>
+    </div>`;
+  } else {
+    const subItems = hasS ? subs.map((s,i) => `
+      <div class="subquest-item ${s.done?'done':''}">
+        <div class="sub-check ${s.done?'checked':''}" onclick="toggleSub(${q.id},${i})"></div>
+        <div class="sub-body">
+          <div class="sub-title">${esc(s.title)}</div>
+          <div class="sub-meta">
+            <span class="sub-diff tag ${diffClass(s.difficulty)}">${s.difficulty||'EASY'}</span>
+            <span class="sub-xp">✦ ${xpEach} glory</span>
+          </div>
+        </div>
+        ${!q.done?`<button class="sub-del-btn" title="Remove step" onclick="deleteSub(${q.id},${i})">✕</button>`:''}
+      </div>`).join('') : '';
+
+    subHTML = `<div class="subquest-container">
+      ${hasS ? `
+        <div class="subquest-header">Steps of the Quest (${subDone}/${subs.length})</div>
+        <div class="sub-progress-label">${pct}% wrought</div>
+        <div class="sub-progress-bar"><div class="sub-progress-fill" style="width:${pct}%"></div></div>
+        ${subItems}` : ''}
+      ${!q.done ? `
+        <div class="sub-add-form" id="sub-form-${q.id}" style="display:none">
+          <input class="sub-add-input" id="sub-input-${q.id}" placeholder="Describe a step..." maxlength="60"
+                 onkeydown="if(event.key==='Enter')addManualSub(${q.id})">
+          <select class="sub-add-diff" id="sub-diff-${q.id}">
+            <option value="EASY">EASY</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HARD">HARD</option>
+            <option value="CRITICAL">CRITICAL</option>
+          </select>
+          <button class="sub-add-confirm" onclick="addManualSub(${q.id})">+ Add Step</button>
+        </div>` : ''}
+    </div>`;
+  }
+
+  return `<div class="quest-card ${q.done?'completed':''}" data-diff="${q.difficulty}" id="card-${q.id}">
+    <div class="quest-card-top">
+      <div class="quest-check ${checkCls}" onclick="toggleQuest(${q.id})"></div>
+      <div class="quest-body">
+        <div class="quest-title">${esc(q.title)}</div>
+        ${q.desc?`<div class="quest-desc">${esc(q.desc)}</div>`:''}
+        ${q.location?`<div class="quest-location"><a href="https://www.google.com/maps/search/${encodeURIComponent(q.location)}" target="_blank" rel="noopener" title="Open in Maps">${esc(q.location)}</a></div>`:''}
+        <div class="quest-meta">
+          <span class="tag tag-category">${q.category}</span>
+          <span class="tag ${diffClass(q.difficulty)}">${q.difficulty}</span>
+          <span class="tag tag-xp">✦ ${q.xp} glory</span>
+          ${q.category==='DAILY'?`<span class="tag tag-daily" title="Renews at midnight — glory is kept">↺ Renews</span>`:''}
+          ${q.category==='WEEKLY'?`<span class="tag tag-weekly" title="Renews every Monday — glory is kept">↺ Weekly</span>`:''}
+        </div>
+        ${subHTML}
+      </div>
+      <div class="quest-actions">
+        ${!q.done?`<button class="icon-btn analyze ${q.analyzing?'analyzing':''}" title="Seek Oracle's Guidance" onclick="analyzeQuest(${q.id})">✧</button>`:''}
+        ${!q.done?`<button class="icon-btn" title="Add a step manually" onclick="toggleSubForm(${q.id})">+</button>`:''}
+        <button class="icon-btn del" title="Tear from board" onclick="deleteQuest(${q.id})">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderQuests() {
+  const active = getFiltered(false);
+  const done   = getFiltered(true);
+
+  document.getElementById('quest-list').innerHTML = active.length
+    ? active.map(questCardHTML).join('')
+    : `<div class="empty-state"><span class="empty-icon">📜</span>
+        The board awaits — no quests have been posted.<br>
+        <span style="font-size:.72rem;opacity:.6">Post the first deed above.</span>
+      </div>`;
+
+  document.getElementById('completed-list').innerHTML = done.length
+    ? done.map(questCardHTML).join('')
+    : `<div style="color:var(--text-faint);font-size:.78rem;text-align:center;padding:16px;font-style:italic">No deeds yet completed.</div>`;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function addQuest() {
+  const title = document.getElementById('quest-title').value.trim();
+  if (!title) { notify('A quest must have a name, adventurer.', 'err'); return; }
+  state.quests.unshift({
+    id: state.nextId++, title,
+    desc:       document.getElementById('quest-desc').value.trim(),
+    location:   document.getElementById('quest-location').value.trim(),
+    category:   document.getElementById('quest-cat').value,
+    difficulty: document.getElementById('quest-diff').value,
+    xp:         parseInt(document.getElementById('quest-xp').value),
+    done: false, subquests: [], analyzing: false
+  });
+  document.getElementById('quest-title').value    = '';
+  document.getElementById('quest-desc').value     = '';
+  document.getElementById('quest-location').value = '';
+  save(); render(); syncAll();
+  notify('The quest has been posted to the board.');
+  document.dispatchEvent(new Event('questDeployed'));
+}
+
+function awardXp(amount) {
+  xp.totalXp  += amount;
+  xp.currentXp += amount;
+  while (xp.currentXp >= XP_PER_LEVEL) {
+    xp.currentXp -= XP_PER_LEVEL;
+    xp.level++;
+    const r = toRoman(xp.level);
+    setTimeout(() => notify(`Thy rank has risen — Rank ${r}`, 'level'), 400);
+  }
+}
+
+function toggleSubForm(id) {
+  const form = document.getElementById(`sub-form-${id}`);
+  if (!form) return;
+  const visible = form.style.display !== 'none';
+  form.style.display = visible ? 'none' : 'flex';
+  if (!visible) document.getElementById(`sub-input-${id}`)?.focus();
+}
+
+function addManualSub(id) {
+  const input = document.getElementById(`sub-input-${id}`);
+  const diff  = document.getElementById(`sub-diff-${id}`);
+  if (!input) return;
+  const title = input.value.trim();
+  if (!title) { input.focus(); return; }
+  const q = state.quests.find(q => q.id === id);
+  if (!q) return;
+  q.subquests = q.subquests || [];
+  q.subquests.push({ title, difficulty: diff?.value || 'EASY', done: false });
+  input.value = '';
+  save(); render(); syncAll();
+  const form = document.getElementById(`sub-form-${id}`);
+  if (form) { form.style.display = 'flex'; document.getElementById(`sub-input-${id}`)?.focus(); }
+}
+
+function deleteSub(questId, idx) {
+  const q = state.quests.find(q => q.id === questId);
+  if (!q) return;
+  const xpEach = Math.floor(q.xp / q.subquests.length);
+  if (q.subquests[idx]?.done) {
+    xp.totalXp   = Math.max(0, xp.totalXp   - xpEach);
+    xp.currentXp = Math.max(0, xp.currentXp - xpEach);
+  }
+  q.subquests.splice(idx, 1);
+  save(); render(); syncAll();
+}
+
+function toggleQuest(id) {
+  const q = state.quests.find(q=>q.id===id);
+  if (!q) return;
+  q.done = !q.done;
+  if (q.done) {
+    (q.subquests||[]).forEach(s=>s.done=true);
+    awardXp(q.xp);
+    notify(`Quest fulfilled — +${q.xp} glory earned.`, 'xp');
+  } else {
+    xp.totalXp  = Math.max(0, xp.totalXp - q.xp);
+    xp.currentXp = Math.max(0, xp.currentXp - q.xp);
+  }
+  save(); render(); syncAll();
+}
+
+function toggleSub(questId, idx) {
+  const q = state.quests.find(q=>q.id===questId);
+  if (!q || q.done) return;
+  const s = q.subquests[idx];
+  s.done = !s.done;
+  const xpEach = Math.floor(q.xp / q.subquests.length);
+  if (s.done) {
+    awardXp(xpEach);
+    notify(`Step complete — +${xpEach} glory.`, 'xp');
+  } else {
+    xp.totalXp  = Math.max(0, xp.totalXp - xpEach);
+    xp.currentXp = Math.max(0, xp.currentXp - xpEach);
+  }
+  if (q.subquests.every(s=>s.done)) {
+    q.done = true;
+    setTimeout(() => notify('All steps fulfilled — the quest is complete!', 'level'), 300);
+  }
+  save(); render(); syncAll();
+}
+
+function deleteQuest(id) {
+  const q = state.quests.find(q=>q.id===id);
+  if (q && q.done) {
+    xp.totalXp  = Math.max(0, xp.totalXp - q.xp);
+    xp.currentXp = Math.max(0, xp.currentXp - q.xp);
+  }
+  state.quests = state.quests.filter(q=>q.id!==id);
+  save(); render(); syncAll();
+  notify('The scroll is torn from the board.');
+}
+
+function setFilter(cat) { activeFilter = cat; render(); }
+function setSort(mode) {
+  sortMode = mode;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sort-'+mode).classList.add('active');
+  render();
+}
+
+// ── AI Breakdown ──────────────────────────────────────────────────────────────
+async function analyzeQuest(id) {
+  const q = state.quests.find(q=>q.id===id);
+  if (!q || q.analyzing) return;
+
+  if (!serverOnline) {
+    notify('The tavern is closed — start server.py first.', 'err');
+    return;
+  }
+
+  q.analyzing = true; q.subquests = [];
+  save(); render();
+  notify('The oracle peers into the scrying orb...', 'ai');
+
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/analyze`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ title: q.title, desc: q.desc||'None', category: q.category, difficulty: q.difficulty })
+    });
+
+    const data = await res.json();
+    if (res.status === 503) throw new Error('No oracle available — set API key or start Ollama.');
+    if (res.status === 401) { logout(); return; }
+    if (!res.ok) throw new Error(data.error || `The spirits refused (${res.status})`);
+
+    const subs = data.subquests;
+    if (!Array.isArray(subs)||!subs.length) throw new Error('The oracle spoke in riddles.');
+
+    q.subquests = subs.slice(0,5).map(s => ({
+      title: String(s.title).slice(0,60), difficulty: s.difficulty||'EASY', done: false
+    }));
+    q.analyzing = false;
+
+    const src      = data.source||'unknown';
+    const srcLabel = src==='claude' ? 'the Arcane Council' : src.startsWith('ollama') ? 'the Local Oracle' : src;
+    save(); render(); syncAll();
+    notify(`${q.subquests.length} steps revealed by ${srcLabel}.`, 'ai');
+
+  } catch(err) {
+    q.analyzing = false;
+    save(); render();
+    notify(err.message, 'err');
+    console.error(err);
+  }
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let notifTimer;
+function notify(msg, type='') {
+  document.querySelector('.notif')?.remove();
+  clearTimeout(notifTimer);
+  const el = document.createElement('div');
+  el.className = 'notif' + (type?' '+type:'');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  notifTimer = setTimeout(()=>el.remove(), 2800);
+}
+
+function copyUrl(el, path) {
+  navigator.clipboard.writeText(`${SERVER_BASE}${path}`).then(() => {
+    const hint = el.querySelector('.copy-hint');
+    hint.textContent = 'Copied!';
+    setTimeout(()=>hint.textContent='COPY', 1500);
+  });
+}
+
+document.getElementById('quest-title').addEventListener('keydown', e => { if(e.key==='Enter') addQuest(); });
+
+// ── MOBILE SIDEBAR ───────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const btn     = document.getElementById('mobile-menu-btn');
+  const isOpen  = sidebar.classList.toggle('open');
+  overlay.classList.toggle('active', isOpen);
+  btn.textContent = isOpen ? '✕' : '☰';
+}
+function closeSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const btn     = document.getElementById('mobile-menu-btn');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('active');
+  btn.textContent = '☰';
+}
+document.addEventListener('questDeployed', closeSidebar);
+</script>
+<script src="friends.js"></script>
+</body>
+</html>
