@@ -1,5 +1,5 @@
 #!/bin/bash
-# start.sh — Launch the QuestLog server
+# start.sh — Launch the Beta Quest server
 # Run from the questlog/ directory: bash start.sh
 
 PORT=${1:-8080}

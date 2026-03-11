@@ -1,5 +1,5 @@
 /**
- * QuestLog — Friends & Co-op module (friends.js)
+ * Beta Quest — Friends & Co-op module (friends.js)
  * Loaded by both quest-log.html and quest-log-fantasy.html.
  *
  * Live updates: polls /api/poll every 5s, diffs against local state,
@@ -40,7 +40,7 @@ async function apiFetch(path, opts = {}) {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     clearTimeout(_pollTimer);
-  } else {
+  } else if (authToken) {
     _poll(); // catch up immediately when tab becomes visible again
   }
 });
@@ -63,10 +63,12 @@ async function loadFriendsData() {
 // ── Live poll loop ────────────────────────────────────────────────────────────
 function _schedulePoll(delay) {
   clearTimeout(_pollTimer);
+  if (!authToken) return; // don't schedule if not logged in
   _pollTimer = setTimeout(_poll, delay);
 }
 
 async function _poll() {
+  if (!authToken) return; // bail immediately if logged out mid-session
   if (_pollRunning) { _schedulePoll(POLL_FAST); return; }
   _pollRunning = true;
   try {
@@ -380,6 +382,7 @@ function renderFriends() {
         <button class="invite-accept-btn" onclick="acceptInvite()">Accept</button>
       </div>
     </div>`;
+  if (typeof refreshPanelHeight === 'function') refreshPanelHeight('friends');
 }
 
 function renderCoopQuests() {
@@ -387,6 +390,7 @@ function renderCoopQuests() {
   if (!el) return;
   if (!coopQuests.length) {
     el.innerHTML = '<div class="coop-empty">No co-op quests yet.</div>';
+    if (typeof refreshPanelHeight === 'function') refreshPanelHeight('coop');
     return;
   }
   el.innerHTML = coopQuests.map(q => {
@@ -427,6 +431,7 @@ function renderCoopQuests() {
         <div class="coop-members">${memberRows}</div>
       </div>`;
   }).join('');
+  if (typeof refreshPanelHeight === 'function') refreshPanelHeight('coop');
 }
 
 // ── Co-op mode toggle ─────────────────────────────────────────────────────────

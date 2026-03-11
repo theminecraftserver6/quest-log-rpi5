@@ -1,4 +1,4 @@
-# QuestLog — Raspberry Pi 5
+# Beta Quest — Raspberry Pi 5
 
 A dual-theme quest log app with user accounts, XP tracking, AI-powered sub-quest breakdown, friends, co-op quests, and a live REST API. Built to run locally on a Raspberry Pi 5.
 
@@ -220,7 +220,7 @@ hailortcli fw-control identify   # verify the HAT is detected
 ```ini
 # /etc/systemd/system/questlog.service
 [Unit]
-Description=QuestLog Server
+Description=Beta Quest Server
 After=network.target
 
 [Service]

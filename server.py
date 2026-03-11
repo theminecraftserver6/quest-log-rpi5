@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-QuestLog Server — Raspberry Pi 5  (v5 — friends + co-op)
+Beta Quest Server — Raspberry Pi 5  (v5 — friends + co-op)
 
 Auth:
   POST /api/register                → {username, password}
@@ -602,7 +602,7 @@ if __name__ == "__main__":
     os_ = "RUNNING ✓" if _check_ollama() else f"not running (model: {OLLAMA_MODEL})"
 
     print("=" * 58)
-    print("  ◈  QUESTLOG SERVER v5  (auth + friends + co-op)")
+    print("  ◈  BETA QUEST SERVER v5  (auth + friends + co-op)")
     print("=" * 58)
     print(f"  Sci-fi        →  http://localhost:{args.port}/")
     print(f"  Fantasy       →  http://localhost:{args.port}/fantasy")

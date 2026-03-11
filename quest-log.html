@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QUEST LOG // OPERATIVE SYSTEM</title>
+<title>BETA QUEST // OPERATIVE SYSTEM</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap');
 
@@ -58,6 +58,7 @@
 
   .app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 20px; }
 
+  /* HEADER */
   .header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 24px; border: 1px solid var(--border); background: var(--panel);
@@ -87,13 +88,32 @@
   .xp-bar { height: 6px; background: rgba(0,245,255,.1); border: 1px solid var(--border); overflow: hidden; }
   .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); box-shadow: 0 0 8px var(--cyan); transition: width .8s cubic-bezier(.4,0,.2,1); }
 
+  /* Server status indicator */
+  .server-status { display: flex; align-items: center; gap: 6px; font-size: .6rem; letter-spacing: 1.5px; }
+  .server-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .server-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 2s ease-in-out infinite; }
+  .server-dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .server-dot.checking { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); animation: blink .8s ease-in-out infinite; }
+  .server-label.online { color: var(--green); }
+  .server-label.offline { color: var(--text-dim); }
+  .server-label.checking { color: var(--yellow); }
+
   .sys-time { font-size: .65rem; color: var(--text-dim); letter-spacing: 2px; }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
   .main { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
 
   .panel { background: var(--panel); border: 1px solid var(--border); padding: 16px; position: relative; }
   .panel-title { font-family: 'Orbitron', monospace; font-size: .65rem; letter-spacing: 3px; color: var(--cyan-dim); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
   .panel-title::before { content: '▶'; color: var(--cyan); font-size: .5rem; }
+  .panel-title.collapsible { cursor:pointer; user-select:none; justify-content:space-between; margin-bottom:0; }
+  .panel-title.collapsible:hover { color:var(--cyan); }
+  .collapse-chevron { font-size:.6rem; opacity:.5; transition:transform .2s; margin-left:auto; flex-shrink:0; }
+  .collapse-chevron.open { transform:rotate(0deg); }
+  .collapse-chevron.closed { transform:rotate(-90deg); }
+  .panel-body { overflow:hidden; transition:max-height .25s ease, opacity .2s ease, padding .2s ease; padding-top:10px; }
+  .panel-body.collapsed { max-height:0 !important; opacity:0; pointer-events:none; padding-top:0; }
 
   .corner-tl, .corner-br { position: absolute; width: 10px; height: 10px; border-color: var(--cyan); border-style: solid; opacity: .5; }
   .corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
@@ -107,6 +127,16 @@
   .cat-btn.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); text-shadow: 0 0 8px var(--cyan); }
   .cat-count { font-size: .65rem; color: var(--text-dim); background: rgba(0,245,255,.05); border: 1px solid var(--border); padding: 1px 6px; }
   .cat-btn.active .cat-count { border-color: var(--cyan); color: var(--cyan); }
+
+  /* API info panel */
+  .api-panel .api-row { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+  .api-label { font-size: .58rem; letter-spacing: 2px; color: var(--text-dim); }
+  .api-url { font-size: .68rem; color: var(--cyan); background: rgba(0,245,255,.05); border: 1px solid rgba(0,245,255,.15); padding: 5px 8px; letter-spacing: .5px; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: space-between; gap: 8px; word-break: break-all; }
+  .api-url:hover { border-color: var(--cyan); background: var(--cyan-glow); }
+  .api-url .copy-hint { font-size: .55rem; color: var(--text-dim); flex-shrink: 0; }
+  .api-divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .api-note { font-size: .62rem; color: var(--text-dim); line-height: 1.6; }
+  .api-note code { color: var(--cyan); background: rgba(0,245,255,.07); padding: 0 4px; }
 
   .form-group { margin-bottom: 10px; }
   .form-label { display: block; font-size: .6rem; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 4px; }
@@ -126,7 +156,6 @@
   .quest-list-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--panel); border: 1px solid var(--border); }
   .quest-list-title { font-family: 'Orbitron', monospace; font-size: .65rem; letter-spacing: 3px; color: var(--cyan-dim); display: flex; align-items: center; gap: 8px; }
   .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 6px var(--green); animation: blink 1.5s ease-in-out infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
   .sort-controls { display: flex; gap: 6px; }
   .sort-btn { background: transparent; border: 1px solid transparent; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: .6rem; padding: 3px 8px; cursor: pointer; letter-spacing: 1px; transition: all .2s; }
@@ -141,7 +170,6 @@
   .quest-card.completed .quest-title { text-decoration: line-through; color: var(--text-dim); }
 
   .quest-card-top { display: flex; align-items: flex-start; gap: 12px; }
-
   .quest-check { width: 20px; height: 20px; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
   .quest-check:hover { border-color: var(--green); }
   .quest-check.checked { border-color: var(--green); background: rgba(57,255,20,.1); }
@@ -150,7 +178,7 @@
   .quest-check.partial::after { content: '◐'; color: var(--yellow); font-size: .7rem; }
 
   .quest-body { flex: 1; min-width: 0; }
-  .quest-title { font-size: .9rem; color: #d0f0f8; margin-bottom: 4px; letter-spacing: .5px; }
+  .quest-title { font-size: .9rem; color: #d0f0f8; margin-bottom: 4px; }
   .quest-desc { font-size: .72rem; color: var(--text-dim); margin-bottom: 8px; line-height: 1.5; }
 
   .quest-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -162,6 +190,9 @@
   .tag-diff-critical { border-color: rgba(255,34,68,.5); color: var(--red); background: rgba(255,34,68,.05); animation: critPulse 2s ease-in-out infinite; }
   @keyframes critPulse { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 8px rgba(255,34,68,.4)} }
   .tag-xp { border-color: rgba(255,215,0,.3); color: var(--yellow); background: rgba(255,215,0,.05); }
+  .tag-daily  { border-color: rgba(0,245,255,.4); color: var(--cyan); background: rgba(0,245,255,.05); animation: dailyPulse 3s ease-in-out infinite; cursor: help; }
+  .tag-weekly { border-color: rgba(191,95,255,.5); color: var(--purple); background: rgba(191,95,255,.06); animation: dailyPulse 4s ease-in-out infinite; cursor: help; }
+  @keyframes dailyPulse { 0%,100%{opacity:1} 50%{opacity:.5} }
 
   .quest-actions { display: flex; gap: 6px; flex-shrink: 0; }
   .icon-btn { width: 28px; height: 28px; background: transparent; border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; font-size: .75rem; display: flex; align-items: center; justify-content: center; transition: all .2s; }
@@ -171,10 +202,8 @@
   .icon-btn.analyzing { animation: aPulse 1s ease-in-out infinite; border-color: var(--purple); color: var(--purple); pointer-events: none; }
   @keyframes aPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-  /* SUB-QUESTS */
   .subquest-container { margin-top: 12px; border-left: 2px solid rgba(191,95,255,.3); padding-left: 14px; display: flex; flex-direction: column; gap: 6px; }
   .subquest-header { font-size: .6rem; letter-spacing: 2px; color: var(--purple); margin-bottom: 2px; }
-
   .sub-progress-bar { height: 3px; background: rgba(191,95,255,.1); border: 1px solid rgba(191,95,255,.2); overflow: hidden; margin-bottom: 8px; }
   .sub-progress-fill { height: 100%; background: linear-gradient(90deg, rgba(191,95,255,.5), var(--purple)); transition: width .5s ease; box-shadow: 0 0 6px var(--purple); }
   .sub-progress-label { font-size: .58rem; color: rgba(191,95,255,.6); letter-spacing: 1px; margin-bottom: 3px; }
@@ -206,18 +235,381 @@
   .notif.xp { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 0 20px rgba(255,215,0,.2); }
   .notif.level { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 30px rgba(0,245,255,.4); font-family: 'Orbitron', monospace; }
   .notif.ai { border-color: var(--purple); color: var(--purple); box-shadow: 0 0 20px rgba(191,95,255,.2); }
-  .notif.err { border-color: var(--red); color: var(--red); }
+  .notif.sync { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 20px rgba(0,245,255,.2); }
+  .notif.sync { border-color: var(--green); color: var(--green); }
   @keyframes nIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
   @keyframes nOut { from{opacity:1} to{opacity:0} }
 
-  @media (max-width: 700px) { .main { grid-template-columns: 1fr; } .header { flex-wrap: wrap; gap: 12px; } .header-stats { flex-wrap: wrap; gap: 12px; } }
+  /* ── MOBILE DRAWER TOGGLE ──────────────────────────── */
+  .mobile-menu-btn {
+    display: none;
+    position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--panel); border: 1px solid var(--cyan);
+    color: var(--cyan); font-size: 1.2rem; cursor: pointer;
+    box-shadow: 0 0 20px rgba(0,245,255,.3);
+    align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .mobile-menu-btn:active { transform: scale(.93); }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 998;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay.active { display: block; }
+
+  /* ── DESKTOP ────────────────────────────────────────── */
+  @media (min-width: 701px) {
+    .main { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+  }
+
+  /* ── MOBILE ─────────────────────────────────────────── */
+  @media (max-width: 700px) {
+    /* Page padding */
+    .app { padding: 10px; }
+
+    /* Header — compact two-row layout */
+    .header {
+      flex-direction: column; align-items: stretch;
+      gap: 10px; padding: 12px 14px;
+      clip-path: none; margin-bottom: 12px;
+    }
+    .header > div:first-child {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+    .logo { font-size: 1.1rem; letter-spacing: 2px; }
+    .header-stats {
+      display: flex; flex-wrap: wrap; align-items: center;
+      gap: 10px 16px;
+    }
+    .stat-chip .label { font-size: .55rem; }
+    .stat-chip .value { font-size: .9rem; }
+    .xp-bar-container { min-width: 120px; flex: 1; }
+    /* Hide clock and server label text on mobile, keep dot */
+    .sys-time { display: none; }
+    .server-label { display: none; }
+    .server-status { gap: 0; }
+
+    /* Sidebar — off-canvas drawer */
+    .main { display: block; }
+    .sidebar {
+      position: fixed; top: 0; left: -100%; z-index: 999;
+      width: min(320px, 88vw); height: 100dvh;
+      overflow-y: auto; padding: 16px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      transition: left .3s cubic-bezier(.4,0,.2,1);
+      -webkit-overflow-scrolling: touch;
+    }
+    .sidebar.open { left: 0; }
+
+    /* Floating toggle button */
+    .mobile-menu-btn { display: flex; }
+
+    /* Push notif above the FAB */
+    .notif { bottom: 84px; }
+
+    /* Quest section takes full width */
+    .quest-section { min-width: 0; }
+
+    /* Quest cards — bigger tap targets */
+    .quest-card { padding: 12px; clip-path: none; }
+    .quest-card-top { gap: 10px; }
+    .quest-check { width: 28px; height: 28px; flex-shrink: 0; }
+    .quest-check.checked::after,
+    .quest-check.partial::after { font-size: .9rem; }
+    .quest-title { font-size: .85rem; }
+    .quest-actions {
+      display: flex; flex-direction: row; gap: 6px;
+      align-items: flex-start; flex-shrink: 0;
+    }
+    .icon-btn { width: 36px; height: 36px; font-size: .85rem; }
+
+    /* Tags wrap freely */
+    .quest-meta { flex-wrap: wrap; gap: 4px; }
+
+    /* Sort buttons — easier to tap */
+    .sort-btn { padding: 6px 10px; font-size: .65rem; }
+    .quest-list-header { padding: 8px 12px; }
+
+    /* Forms */
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .form-input, .form-select, .form-textarea {
+      font-size: .85rem; padding: 10px 12px;
+    }
+    .form-textarea { height: 64px; }
+    .btn-add { padding: 13px; font-size: .68rem; clip-path: none; }
+    .coop-toggle-btn { padding: 10px; }
+
+    /* Auth box — full screen on very small phones */
+    .auth-box {
+      width: min(340px, 94vw);
+      padding: 28px 20px 22px;
+      clip-path: none;
+      margin: 16px;
+    }
+    .auth-field input { font-size: 1rem; padding: 10px 12px; }
+    .auth-submit { padding: 13px; font-size: .72rem; clip-path: none; }
+
+    /* Friends panel inside drawer */
+    .invite-row { flex-wrap: wrap; }
+    .invite-in { min-width: 0; }
+
+    /* Co-op add row */
+    .coop-add-row { flex-wrap: wrap; }
+    .coop-sel { min-width: 0; }
+  }
+
+  /* ── FRIENDS & CO-OP ───────────────────────────────── */
+  .friend-list    { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .friend-empty   { font-size:.65rem; color:var(--text-dim); text-align:center; padding:10px; letter-spacing:1px; }
+  .friend-row     { display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--border); background:rgba(0,245,255,.02); }
+  .friend-info    { display:flex; flex-direction:column; min-width:70px; }
+  .friend-name    { font-size:.72rem; color:var(--cyan); letter-spacing:1px; }
+  .friend-level   { font-family:'Orbitron',monospace; font-size:.55rem; color:var(--text-dim); }
+  .friend-xp-bar-wrap { flex:1; display:flex; align-items:center; gap:6px; }
+  .friend-xp-bar  { flex:1; height:4px; background:rgba(0,245,255,.08); border:1px solid var(--border); overflow:hidden; }
+  .friend-xp-fill { height:100%; background:var(--yellow); box-shadow:0 0 6px var(--yellow); transition:width .6s ease; }
+  .friend-xp-fill.xp-updated { animation: xpFlash .6s ease; }
+  @keyframes xpFlash { 0%,100%{box-shadow:0 0 6px var(--yellow)} 50%{box-shadow:0 0 16px var(--yellow),0 0 30px rgba(255,215,0,.4)} }
+  .friend-xp-num  { font-size:.58rem; color:var(--yellow); min-width:50px; text-align:right; }
+  .friend-remove-btn { background:transparent; border:none; color:var(--text-dim); cursor:pointer; font-size:.7rem; padding:2px 4px; transition:color .2s; }
+  .friend-remove-btn:hover { color:var(--red); }
+
+  .invite-section { display:flex; flex-direction:column; gap:7px; }
+  .invite-row     { display:flex; gap:6px; align-items:center; }
+  .invite-gen-btn { flex:1; background:transparent; border:1px solid var(--border); color:var(--cyan); font-family:'Share Tech Mono',monospace; font-size:.62rem; padding:6px 8px; cursor:pointer; letter-spacing:1px; transition:all .2s; }
+  .invite-gen-btn:hover { border-color:var(--cyan); background:var(--cyan-glow); }
+  .invite-code    { font-family:'Orbitron',monospace; font-size:.85rem; color:var(--green); letter-spacing:4px; cursor:pointer; padding:4px 8px; border:1px solid rgba(57,255,20,.2); min-width:90px; text-align:center; transition:all .2s; }
+  .invite-code:not(:empty):hover { border-color:var(--green); background:rgba(57,255,20,.05); }
+  .invite-in      { flex:1; font-size:.72rem; padding:6px 8px; }
+  .invite-accept-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:.62rem; padding:6px 10px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .invite-accept-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+
+  .coop-section   { display:flex; flex-direction:column; gap:10px; }
+  .coop-empty     { color:var(--text-dim); font-size:.7rem; text-align:center; padding:14px; letter-spacing:1px; border:1px dashed var(--border); }
+  .coop-card      { background:var(--panel); border:1px solid rgba(191,95,255,.3); border-left:4px solid var(--purple); padding:12px 14px; animation:fadeIn .3s ease; }
+  .coop-card.coop-updated { animation: coopFlash .6s ease; }
+  @keyframes coopFlash { 0%,100%{border-color:rgba(191,95,255,.3)} 50%{border-color:var(--purple);box-shadow:0 0 14px rgba(191,95,255,.25)} }
+  .coop-card.all-done { opacity:.45; border-left-color:var(--green); }
+  .coop-card-top  { display:flex; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .coop-body      { flex:1; }
+  .coop-title     { font-family:'Orbitron',monospace; font-size:.78rem; color:var(--cyan); margin-bottom:3px; }
+  .coop-desc      { font-size:.7rem; color:var(--text-dim); margin-bottom:6px; }
+  .coop-meta-tags { display:flex; gap:5px; flex-wrap:wrap; }
+  .coop-tag       { border-color:rgba(191,95,255,.5); color:var(--purple); background:rgba(191,95,255,.05); }
+  .quest-location { display:flex; align-items:center; gap:5px; font-size:.68rem; color:var(--text-dim); margin-top:4px; letter-spacing:.5px; }
+  .quest-location::before { content:'📍'; font-size:.75rem; }
+  .quest-location a { color:var(--cyan-dim); text-decoration:none; }
+  .quest-location a:hover { color:var(--cyan); text-decoration:underline; }
+
+  /* Manual sub-quest form */
+  .sub-add-form {
+    display: none; align-items: center; gap: 6px;
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px dashed rgba(0,245,255,.15);
+  }
+  .sub-add-input {
+    flex: 1; background: rgba(0,245,255,.03); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Share Tech Mono', monospace;
+    font-size: .72rem; padding: 5px 8px; outline: none; min-width: 0;
+    transition: border-color .2s;
+  }
+  .sub-add-input:focus { border-color: var(--cyan); }
+  .sub-add-diff {
+    background: rgba(0,245,255,.03); border: 1px solid var(--border);
+    color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+    font-size: .65rem; padding: 5px 4px; outline: none; cursor: pointer;
+    flex-shrink: 0;
+  }
+  .sub-add-diff option { background: var(--bg2); }
+  .sub-add-confirm {
+    background: transparent; border: 1px solid var(--cyan); color: var(--cyan);
+    font-family: 'Share Tech Mono', monospace; font-size: .65rem; letter-spacing: 1px;
+    padding: 5px 10px; cursor: pointer; flex-shrink: 0; transition: all .2s; white-space: nowrap;
+  }
+  .sub-add-confirm:hover { background: var(--cyan-glow); }
+  .sub-del-btn {
+    background: transparent; border: none; color: var(--text-dim);
+    cursor: pointer; font-size: .65rem; padding: 2px 4px; flex-shrink: 0;
+    opacity: 0; transition: opacity .15s, color .15s;
+  }
+  .subquest-item:hover .sub-del-btn { opacity: 1; }
+  .sub-del-btn:hover { color: var(--red); }  .coop-actions   { display:flex; gap:5px; flex-direction:column; align-items:flex-end; }
+  .coop-done-btn  { background:transparent; border:1px solid var(--green); color:var(--green); font-family:'Share Tech Mono',monospace; font-size:.62rem; padding:4px 10px; cursor:pointer; transition:all .2s; }
+  .coop-done-btn:hover { background:rgba(57,255,20,.08); box-shadow:0 0 8px rgba(57,255,20,.2); }
+  .coop-progress  { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .coop-progress-bar  { flex:1; height:4px; background:rgba(191,95,255,.1); border:1px solid var(--border); overflow:hidden; }
+  .coop-progress-fill { height:100%; background:var(--purple); box-shadow:0 0 6px var(--purple); transition:width .5s ease; }
+  .coop-progress-label{ font-size:.58rem; color:var(--text-dim); white-space:nowrap; }
+  .coop-members   { display:flex; flex-direction:column; gap:3px; }
+  .coop-member-status { display:flex; align-items:center; gap:6px; font-size:.65rem; color:var(--text-dim); }
+  .coop-member-status.done { color:var(--text-faint); text-decoration:line-through; }
+  .coop-dot       { width:6px; height:6px; border-radius:50%; background:var(--border); flex-shrink:0; }
+  .coop-dot.done  { background:var(--green); box-shadow:0 0 4px var(--green); }
+  .coop-member-xp-tag { margin-left:auto; color:var(--yellow); font-size:.58rem; }
+
+  /* Co-op member builder inside add-quest form */
+  .coop-toggle-btn{ width:100%; background:transparent; border:1px solid rgba(191,95,255,.4); color:var(--purple); font-family:'Share Tech Mono',monospace; font-size:.62rem; padding:6px; cursor:pointer; letter-spacing:1px; transition:all .2s; margin-bottom:4px; }
+  .coop-toggle-btn:hover { border-color:var(--purple); background:rgba(191,95,255,.05); }
+  #coop-form-wrap { display:none; }
+  #coop-form-wrap.active { display:block; }
+  .coop-form-area { display:flex; flex-direction:column; gap:5px; margin-bottom:8px; }
+  .coop-member-row{ display:flex; align-items:center; gap:6px; padding:4px 8px; background:rgba(191,95,255,.05); border:1px solid rgba(191,95,255,.2); font-size:.7rem; }
+  .coop-member-name{ flex:1; color:var(--cyan); }
+  .coop-member-xp { color:var(--yellow); font-size:.65rem; }
+  .coop-remove-btn{ background:transparent; border:none; color:var(--text-dim); cursor:pointer; }
+  .coop-remove-btn:hover { color:var(--red); }
+  .coop-add-row   { display:flex; gap:5px; align-items:center; }
+  .coop-sel       { flex:1; font-size:.7rem; padding:5px; }
+  .coop-xp-in     { width:64px; font-size:.7rem; padding:5px; }
+  .coop-add-btn   { background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:.62rem; padding:5px 8px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .coop-add-btn:hover { border-color:var(--purple); color:var(--purple); }
+
+  /* ── LOGIN OVERLAY ─────────────────────────────────── */
+  .auth-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    animation: authFadeIn .4s ease;
+  }
+  .auth-overlay.hidden { display: none; }
+  .hidden { display: none !important; }
+  @keyframes authFadeIn { from{opacity:0} to{opacity:1} }
+
+  .auth-box {
+    width: 360px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 36px 32px 28px;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+  }
+  .auth-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanLine 3s linear infinite;
+  }
+  .auth-logo {
+    font-family: 'Orbitron', monospace; font-weight: 900;
+    font-size: 1.5rem; color: var(--cyan);
+    text-shadow: 0 0 20px var(--cyan), 0 0 40px rgba(0,245,255,.4);
+    letter-spacing: 4px; text-align: center; margin-bottom: 4px;
+  }
+  .auth-logo span { color: var(--orange); }
+  .auth-sub {
+    text-align: center; font-size: .6rem; color: var(--text-dim);
+    letter-spacing: 3px; margin-bottom: 28px;
+  }
+  .auth-tabs {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0; margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+  .auth-tab {
+    background: transparent; border: none;
+    color: var(--text-dim); font-family: 'Orbitron', monospace;
+    font-size: .6rem; letter-spacing: 2px; padding: 8px;
+    cursor: pointer; transition: all .2s; text-transform: uppercase;
+  }
+  .auth-tab.active { background: var(--cyan-glow); color: var(--cyan); border-bottom: 2px solid var(--cyan); }
+  .auth-tab:hover:not(.active) { color: var(--text); }
+
+  .auth-field { margin-bottom: 14px; }
+  .auth-field label { display: block; font-size: .58rem; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 4px; }
+  .auth-field input {
+    width: 100%; background: rgba(0,245,255,.03);
+    border: 1px solid var(--border); color: var(--text);
+    font-family: 'Share Tech Mono', monospace; font-size: .85rem;
+    padding: 8px 10px; outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .auth-field input:focus { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,245,255,.15); }
+
+  .auth-submit {
+    width: 100%; background: transparent; border: 1px solid var(--cyan);
+    color: var(--cyan); font-family: 'Orbitron', monospace;
+    font-size: .7rem; font-weight: 700; letter-spacing: 3px;
+    padding: 11px; cursor: pointer; transition: all .2s;
+    margin-top: 6px; position: relative; overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  }
+  .auth-submit::before {
+    content: ''; position: absolute; inset: 0; left: -100%;
+    background: var(--cyan-glow); transition: left .3s;
+  }
+  .auth-submit:hover::before { left: 0; }
+  .auth-submit:hover { box-shadow: 0 0 20px rgba(0,245,255,.3); }
+  .auth-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+  .auth-error {
+    color: var(--red); font-size: .68rem; letter-spacing: 1px;
+    margin-top: 10px; text-align: center; min-height: 1.2em;
+  }
+  .auth-user-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .auth-username {
+    font-family: 'Orbitron', monospace; font-size: .65rem;
+    color: var(--cyan); letter-spacing: 2px;
+  }
+  .auth-username::before { content: '▶ '; font-size: .5rem; }
+  .auth-logout {
+    background: transparent; border: 1px solid rgba(255,34,68,.3);
+    color: var(--red); font-family: 'Share Tech Mono', monospace;
+    font-size: .6rem; padding: 3px 10px; cursor: pointer;
+    letter-spacing: 1px; transition: all .2s;
+  }
+  .auth-logout:hover { border-color: var(--red); background: rgba(255,34,68,.08); }
 </style>
 </head>
 <body>
+
+<!-- ── AUTH OVERLAY ─────────────────────────────────────── -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">BETA<span>QUEST</span></div>
+    <div class="auth-sub">OPERATIVE AUTHENTICATION REQUIRED</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="showTab('login')">LOGIN</button>
+      <button class="auth-tab" id="tab-register" onclick="showTab('register')">REGISTER</button>
+    </div>
+    <div class="auth-field">
+      <label>OPERATIVE ID</label>
+      <input type="text" id="auth-username" placeholder="username" autocomplete="username" maxlength="32">
+    </div>
+    <div class="auth-field">
+      <label>ACCESS CODE</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" maxlength="128">
+    </div>
+    <div class="auth-field hidden" id="auth-confirm-wrap">
+      <label>CONFIRM ACCESS CODE</label>
+      <input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password" maxlength="128">
+    </div>
+    <button class="auth-submit" id="auth-submit" onclick="submitAuth()">▶ AUTHENTICATE</button>
+    <div class="auth-error" id="auth-error"></div>
+  </div>
+</div>
+
 <div class="app">
 
+  <!-- Mobile sidebar toggle -->
+  <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <header class="header">
-    <div class="logo">QUEST<span>LOG</span> <span style="font-size:.5rem;color:var(--text-dim);letter-spacing:2px">SYS v3.0</span></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="logo">BETA<span>QUEST</span> <span style="font-size:.5rem;color:var(--text-dim);letter-spacing:2px">SYS v4.0</span></div>
+      <div class="auth-user-bar">
+        <span class="auth-username" id="header-username"></span>
+        <button class="auth-logout" onclick="logout()">LOGOUT</button>
+      </div>
+    </div>
     <div class="header-stats">
       <div class="stat-chip">
         <span class="label">LEVEL</span>
@@ -235,54 +627,111 @@
         <span class="label">TOTAL XP</span>
         <span class="value xp-value" id="total-xp">0</span>
       </div>
+      <div class="server-status">
+        <div class="server-dot checking" id="srv-dot"></div>
+        <span class="server-label checking" id="srv-label">CONNECTING</span>
+      </div>
       <span class="sys-time" id="sys-time"></span>
     </div>
   </header>
 
   <div class="main">
     <aside class="sidebar">
+
       <div class="panel">
         <div class="corner-tl"></div><div class="corner-br"></div>
-        <div class="panel-title">FILTER BY CATEGORY</div>
-        <div class="category-list" id="category-list"></div>
+        <div class="panel-title collapsible" onclick="togglePanel('filter')">FILTER BY CATEGORY<span class="collapse-chevron" id="chev-filter">▾</span></div>
+        <div class="panel-body" id="body-filter">
+          <div class="category-list" id="category-list"></div>
+        </div>
       </div>
+
+      <!-- API Info Panel -->
+      <div class="panel api-panel">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-title collapsible" onclick="togglePanel('api')">EXTERNAL API<span class="collapse-chevron" id="chev-api">▾</span></div>
+        <div class="panel-body" id="body-api">
+          <div class="api-row">
+            <span class="api-label">XP STATE</span>
+            <div class="api-url" onclick="copyUrl(this, '/api/xp')">
+              <span id="api-xp-url">http://localhost:8080/api/xp</span>
+              <span class="copy-hint">COPY</span>
+            </div>
+          </div>
+          <div class="api-row">
+            <span class="api-label">QUEST LIST</span>
+            <div class="api-url" onclick="copyUrl(this, '/api/quests')">
+              <span id="api-quests-url">http://localhost:8080/api/quests</span>
+              <span class="copy-hint">COPY</span>
+            </div>
+          </div>
+          <div class="api-divider"></div>
+          <div class="api-note">
+            Both endpoints support <code>GET</code>.<br>
+            XP state updates automatically when quests change.<br>
+            Data also saved to <code>xp_state.json</code> on disk.
+          </div>
+        </div>
+      </div>
+
       <div class="panel">
         <div class="corner-tl"></div><div class="corner-br"></div>
-        <div class="panel-title">NEW DIRECTIVE</div>
-        <div class="form-group">
-          <label class="form-label">QUEST TITLE *</label>
-          <input class="form-input" id="quest-title" placeholder="Enter objective..." maxlength="60">
-        </div>
-        <div class="form-group">
-          <label class="form-label">DESCRIPTION</label>
-          <textarea class="form-textarea form-input" id="quest-desc" placeholder="Details..."></textarea>
-        </div>
-        <div class="form-row">
+        <div class="panel-title collapsible" onclick="togglePanel('newquest')">NEW DIRECTIVE<span class="collapse-chevron" id="chev-newquest">▾</span></div>
+        <div class="panel-body" id="body-newquest">
           <div class="form-group">
-            <label class="form-label">CATEGORY</label>
-            <select class="form-select" id="quest-cat">
-              <option>MAIN</option><option>SIDE</option><option>DAILY</option>
-              <option>URGENT</option><option>RECON</option><option>BUILD</option>
+            <label class="form-label">QUEST TITLE *</label>
+            <input class="form-input" id="quest-title" placeholder="Enter objective..." maxlength="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">DESCRIPTION</label>
+            <textarea class="form-textarea form-input" id="quest-desc" placeholder="Details..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">CATEGORY</label>
+              <select class="form-select" id="quest-cat">
+                <option>MAIN</option><option>SIDE</option><option>DAILY</option>
+                <option>WEEKLY</option><option>URGENT</option><option>RECON</option><option>BUILD</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">PRIORITY</label>
+              <select class="form-select" id="quest-diff">
+                <option>EASY</option><option>MEDIUM</option><option>HARD</option><option>CRITICAL</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">XP REWARD</label>
+            <select class="form-select" id="quest-xp">
+              <option value="10">10 XP — Minor</option>
+              <option value="25">25 XP — Standard</option>
+              <option value="50">50 XP — Major</option>
+              <option value="100">100 XP — Epic</option>
+              <option value="200">200 XP — Legendary</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">PRIORITY</label>
-            <select class="form-select" id="quest-diff">
-              <option>EASY</option><option>MEDIUM</option><option>HARD</option><option>CRITICAL</option>
-            </select>
+            <label class="form-label">📍 LOCATION <span style="color:var(--text-dim);font-size:.6em;letter-spacing:1px">(OPTIONAL)</span></label>
+            <input class="form-input" id="quest-location" placeholder="Where is this happening?" maxlength="80">
           </div>
+          <div id="coop-form-wrap">
+            <div class="form-label" style="margin-bottom:6px;color:var(--purple)">CO-OP MEMBERS + XP SHARES</div>
+            <div id="coop-form-area" class="coop-form-area"></div>
+            <button class="btn-add" id="coop-deploy-btn" style="display:none;border-color:var(--purple);color:var(--purple)" onclick="createCoopQuest()">⚔ DEPLOY CO-OP QUEST</button>
+          </div>
+          <button class="coop-toggle-btn" onclick="toggleCoopMode()">⚔ CO-OP MODE</button>
+          <button class="btn-add" id="solo-deploy-btn" onclick="addQuest()">▶ DEPLOY QUEST</button>
         </div>
-        <div class="form-group">
-          <label class="form-label">XP REWARD</label>
-          <select class="form-select" id="quest-xp">
-            <option value="10">10 XP — Minor</option>
-            <option value="25">25 XP — Standard</option>
-            <option value="50">50 XP — Major</option>
-            <option value="100">100 XP — Epic</option>
-            <option value="200">200 XP — Legendary</option>
-          </select>
+      </div>
+
+      <!-- Friends Panel -->
+      <div class="panel">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-title collapsible" onclick="togglePanel('friends')">⚔ ALLIED OPERATIVES<span class="collapse-chevron" id="chev-friends">▾</span></div>
+        <div class="panel-body" id="body-friends">
+          <div id="friends-panel-body"></div>
         </div>
-        <button class="btn-add" onclick="addQuest()">▶ DEPLOY QUEST</button>
       </div>
     </aside>
 
@@ -296,48 +745,384 @@
         </div>
       </div>
       <div class="quest-list" id="quest-list"></div>
+
+      <!-- Co-op Quests -->
       <div class="panel" style="margin-top:8px">
         <div class="corner-tl"></div><div class="corner-br"></div>
-        <div class="panel-title" style="color:rgba(57,255,20,.5)">▶ COMPLETED OBJECTIVES — <span id="completed-count-label">0</span></div>
-        <div class="quest-list" id="completed-list"></div>
+        <div class="panel-title collapsible" style="color:var(--purple)" onclick="togglePanel('coop')">⚔ CO-OP DIRECTIVES<span class="collapse-chevron" id="chev-coop">▾</span></div>
+        <div class="panel-body" id="body-coop">
+          <div class="coop-section"><div id="coop-list"><div class="coop-empty">No co-op quests yet.</div></div></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:8px">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-title collapsible" style="color:rgba(57,255,20,.5)" onclick="togglePanel('completed')">▶ COMPLETED OBJECTIVES — <span id="completed-count-label">0</span><span class="collapse-chevron" id="chev-completed">▾</span></div>
+        <div class="panel-body" id="body-completed">
+          <div class="quest-list" id="completed-list"></div>
+        </div>
       </div>
     </section>
   </div>
 </div>
 
 <script>
+// ===== CONFIG =====
+const SERVER_BASE = window.location.port === '8080' || window.location.hostname !== ''
+  ? window.location.origin
+  : 'http://localhost:8080';
+
 const DIFF_ORDER = { CRITICAL:0, HARD:1, MEDIUM:2, EASY:3 };
 const XP_PER_LEVEL = 100;
 
-let state = (() => {
-  try { return JSON.parse(localStorage.getItem('questlog_v3')) || null; } catch(e) { return null; }
-})() || { quests:[], totalXp:0, level:1, currentXp:0, nextId:1 };
+// ===== AUTH =====
+const TOKEN_KEY = 'questlog_token';
+const USER_KEY  = 'questlog_username';
+const QUEST_KEY = 'questlog_scifi';
 
+let authToken    = localStorage.getItem(TOKEN_KEY) || null;
+let authUsername = localStorage.getItem(USER_KEY)  || null;
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` };
+}
+
+function showTab(tab) {
+  const isReg = tab === 'register';
+  document.getElementById('tab-login').classList.toggle('active', !isReg);
+  document.getElementById('tab-register').classList.toggle('active', isReg);
+  document.getElementById('auth-confirm-wrap').classList.toggle('hidden', !isReg);
+  document.getElementById('auth-submit').textContent = isReg ? '▶ CREATE ACCOUNT' : '▶ AUTHENTICATE';
+  document.getElementById('auth-error').textContent = '';
+}
+
+async function submitAuth() {
+  const btn      = document.getElementById('auth-submit');
+  const errEl    = document.getElementById('auth-error');
+  const username = document.getElementById('auth-username').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const confirm  = document.getElementById('auth-confirm').value;
+  const isReg    = document.getElementById('tab-register').classList.contains('active');
+
+  errEl.textContent = '';
+  if (!username || !password) { errEl.textContent = '// OPERATIVE ID AND ACCESS CODE REQUIRED'; return; }
+  if (isReg && password !== confirm) { errEl.textContent = '// ACCESS CODES DO NOT MATCH'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '// AUTHENTICATING...';
+
+  try {
+    const res  = await fetch(`${SERVER_BASE}/api/${isReg ? 'register' : 'login'}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = `// ${data.error || 'AUTH FAILED'}`; return; }
+
+    authToken    = data.token;
+    authUsername = data.username;
+    localStorage.setItem(TOKEN_KEY, authToken);
+    localStorage.setItem(USER_KEY, authUsername);
+    document.getElementById('auth-overlay').classList.add('hidden');
+    document.getElementById('header-username').textContent = authUsername;
+    await initApp();
+
+  } catch(e) {
+    errEl.textContent = '// SERVER UNREACHABLE — IS server.py RUNNING?';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = document.getElementById('tab-register').classList.contains('active')
+      ? '▶ CREATE ACCOUNT' : '▶ AUTHENTICATE';
+  }
+}
+
+async function logout() {
+  try {
+    await fetch(`${SERVER_BASE}/api/logout`, { method:'POST', headers: authHeaders() });
+  } catch(e){}
+  authToken = null; authUsername = null;
+  if (typeof _pollTimer !== 'undefined') clearTimeout(_pollTimer); // stop poll loop
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  // Reset state
+  xp    = { level:1, currentXp:0, totalXp:0 };
+  state = { quests:[], nextId:1, lastDailyReset: null, lastWeeklyReset: null };
+  document.getElementById('auth-overlay').classList.remove('hidden');
+  document.getElementById('auth-error').textContent = '';
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-confirm').value  = '';
+  showTab('login');
+}
+
+// Enter key submits
+['auth-username','auth-password','auth-confirm'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') submitAuth(); });
+});
+
+// ===== COLLAPSIBLE PANELS =====
+const COLLAPSE_KEY = 'questlog_collapsed';
+const PANELS = ['filter','api','newquest','friends','coop','completed'];
+
+function _collapseState() {
+  try { return JSON.parse(localStorage.getItem(COLLAPSE_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function togglePanel(id) {
+  const body  = document.getElementById(`body-${id}`);
+  const chev  = document.getElementById(`chev-${id}`);
+  if (!body) return;
+  const isOpen = !body.classList.contains('collapsed');
+  if (isOpen) {
+    // Snapshot current height before collapsing so CSS transition has a from-value
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      body.classList.add('collapsed');
+      body.style.maxHeight = '0px';
+    });
+  } else {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = 'none';
+  }
+  if (chev) { chev.classList.toggle('closed', isOpen); chev.classList.toggle('open', !isOpen); }
+  const s = _collapseState();
+  s[id] = isOpen;
+  localStorage.setItem(COLLAPSE_KEY, JSON.stringify(s));
+}
+
+function refreshPanelHeight(id) {
+  const body = document.getElementById(`body-${id}`);
+  if (body && !body.classList.contains('collapsed')) {
+    body.style.maxHeight = 'none'; // let it expand fully first
+    requestAnimationFrame(() => { body.style.maxHeight = body.scrollHeight + 'px'; });
+  }
+}
+
+function initPanels() {
+  const s = _collapseState();
+  PANELS.forEach(id => {
+    const body = document.getElementById(`body-${id}`);
+    const chev = document.getElementById(`chev-${id}`);
+    if (!body) return;
+    if (s[id]) {
+      body.style.maxHeight = '0px';
+      body.classList.add('collapsed');
+      if (chev) { chev.classList.add('closed'); }
+    } else {
+      body.style.maxHeight = 'none'; // unconstrained — content sets its own height
+      if (chev) { chev.classList.add('open'); }
+    }
+  });
+}
+
+
+let xp    = { level:1, currentXp:0, totalXp:0 };
+let state = { quests:[], nextId:1, lastDailyReset: null, lastWeeklyReset: null };
 let activeFilter = 'ALL', sortMode = 'new';
+let serverOnline = false;
 
-const save = () => { try { localStorage.setItem('questlog_v3', JSON.stringify(state)); } catch(e){} };
+function saveLocal() {
+  try { localStorage.setItem(QUEST_KEY, JSON.stringify(state)); } catch(e){}
+}
 
-// Clock
+// ===== DAILY RESET =====
+function todayStamp() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function weekStamp() {
+  // Returns ISO week string "YYYY-Www" — same for every day of a given Mon-Sun week
+  const d = new Date();
+  const day = d.getDay() || 7; // Mon=1 … Sun=7
+  d.setDate(d.getDate() + 1 - day); // back to Monday
+  return `${d.getFullYear()}-W${String(Math.ceil(d.getDate() / 7)).padStart(2,'0')}-${d.getMonth()}`;
+}
+
+function runDailyReset() {
+  const today = todayStamp();
+  if (state.lastDailyReset === today) return;
+  let n = 0;
+  state.quests.forEach(q => {
+    if (q.category !== 'DAILY' || !q.done) return;
+    q.done = false;
+    (q.subquests || []).forEach(s => s.done = false);
+    q.analyzing = false;
+    n++;
+  });
+  state.lastDailyReset = today;
+  save();
+  if (n > 0) setTimeout(() => notify(`// ${n} DAILY DIRECTIVE${n > 1 ? 'S' : ''} RESET — XP KEPT`, 'sync'), 300);
+}
+
+function runWeeklyReset() {
+  const week = weekStamp();
+  if (state.lastWeeklyReset === week) return;
+  let n = 0;
+  state.quests.forEach(q => {
+    if (q.category !== 'WEEKLY' || !q.done) return;
+    q.done = false;
+    (q.subquests || []).forEach(s => s.done = false);
+    q.analyzing = false;
+    n++;
+  });
+  state.lastWeeklyReset = week;
+  save();
+  if (n > 0) setTimeout(() => notify(`// ${n} WEEKLY DIRECTIVE${n > 1 ? 'S' : ''} RESET — XP KEPT`, 'sync'), 500);
+}
+
+// ===== SERVER SYNC =====
+async function pushXp() {
+  if (!serverOnline || !authToken) return;
+  const done = state.quests.filter(q => q.done).length;
+  try {
+    await fetch(`${SERVER_BASE}/api/xp`, {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ level: xp.level, currentXp: xp.currentXp,
+        totalXp: xp.totalXp, xpToNextLevel: XP_PER_LEVEL, completedQuests: done })
+    });
+  } catch(e) {}
+}
+
+async function pushQuests() {
+  if (!serverOnline || !authToken) return;
+  try {
+    await fetch(`${SERVER_BASE}/api/quests`, {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify(state.quests)
+    });
+  } catch(e) {}
+}
+
+const save = () => { saveLocal(); syncAll(); };
+function syncAll() { pushXp(); pushQuests(); }
+
+// Load user's data from server (called after login)
+async function loadFromServer() {
+  try {
+    const [xpRes, qRes] = await Promise.all([
+      fetch(`${SERVER_BASE}/api/xp`,     { headers: authHeaders() }),
+      fetch(`${SERVER_BASE}/api/quests`, { headers: authHeaders() })
+    ]);
+    if (xpRes.status === 401 || qRes.status === 401) { logout(); return; }
+    if (xpRes.ok) {
+      const data = await xpRes.json();
+      xp = { level: data.level||1, currentXp: data.currentXp||0, totalXp: data.totalXp||0 };
+    }
+    if (qRes.ok) {
+      const quests = await qRes.json();
+      if (Array.isArray(quests) && quests.length) {
+        state.quests  = quests;
+        state.nextId  = Math.max(...quests.map(q=>q.id||0), 0) + 1;
+      }
+    }
+  } catch(e) {}
+}
+
+async function checkServer() {
+  const dot = document.getElementById('srv-dot');
+  const lbl = document.getElementById('srv-label');
+  if (!authToken) return;
+  try {
+    const r = await fetch(`${SERVER_BASE}/api/xp`, { signal: AbortSignal.timeout(2000), headers: authHeaders() });
+    if (r.ok) {
+      serverOnline = true;
+      dot.className = 'server-dot online'; lbl.className = 'server-label online'; lbl.textContent = 'SERVER ONLINE';
+      updateApiUrls(); return;
+    }
+    if (r.status === 401) { logout(); return; }
+  } catch(e) {}
+  serverOnline = false;
+  dot.className = 'server-dot offline'; lbl.className = 'server-label offline'; lbl.textContent = 'SERVER OFFLINE';
+}
+
+function updateApiUrls() {
+  document.getElementById('api-xp-url').textContent     = `${SERVER_BASE}/api/xp`;
+  document.getElementById('api-quests-url').textContent = `${SERVER_BASE}/api/quests`;
+}
+
+async function initApp() {
+  serverOnline = true;
+  document.getElementById('header-username').textContent = authUsername;
+  // Try loading cached state while server loads
+  try {
+    const cached = JSON.parse(localStorage.getItem(QUEST_KEY));
+    if (cached) { state = cached; }
+  } catch(e) {}
+  await loadFromServer();
+  runDailyReset();
+  runWeeklyReset();
+  render();
+  initPanels();
+  checkServer();
+  setInterval(checkServer, 15000);
+  scheduleNextMidnight();
+  loadFriendsData();
+}
+
+// On page load — if token exists, try to resume session
+(async () => {
+  if (authToken) {
+    try {
+      const r = await fetch(`${SERVER_BASE}/api/me`, { headers: authHeaders() });
+      if (r.ok) {
+        const data = await r.json();
+        authUsername = data.username;
+        localStorage.setItem(USER_KEY, authUsername);
+        document.getElementById('auth-overlay').classList.add('hidden');
+        await initApp();
+        return;
+      }
+    } catch(e) {}
+    // Token invalid — clear and show login
+    authToken = null; authUsername = null;
+    localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);
+  }
+})();
+
+function scheduleNextMidnight() {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+  const msUntil = midnight - now;
+  setTimeout(() => {
+    runDailyReset();
+    runWeeklyReset();
+    render();
+    syncAll();
+    scheduleNextMidnight();
+  }, msUntil);
+}
+
+// ===== CLOCK =====
 setInterval(() => {
   document.getElementById('sys-time').textContent = new Date().toLocaleTimeString('en-GB',{hour12:false});
 }, 1000);
 
 // ===== RENDER =====
-function render() { renderStats(); renderCategories(); renderQuests(); }
+function render() {
+  renderStats(); renderCategories(); renderQuests();
+  // Refresh max-heights for open panels so new content isn't clipped
+  requestAnimationFrame(() => {
+    PANELS.forEach(id => {
+      const body = document.getElementById(`body-${id}`);
+      if (body && !body.classList.contains('collapsed')) body.style.maxHeight = body.scrollHeight + 'px';
+    });
+  });
+}
 
 function renderStats() {
-  document.getElementById('level-display').textContent = String(state.level).padStart(2,'0');
-  const pct = Math.min((state.currentXp / XP_PER_LEVEL) * 100, 100);
+  document.getElementById('level-display').textContent = String(xp.level).padStart(2,'0');
+  const pct = Math.min((xp.currentXp / XP_PER_LEVEL) * 100, 100);
   document.getElementById('xp-bar-fill').style.width = pct + '%';
-  document.getElementById('xp-label').textContent = `${state.currentXp} / ${XP_PER_LEVEL}`;
-  document.getElementById('total-xp').textContent = state.totalXp;
+  document.getElementById('xp-label').textContent = `${xp.currentXp} / ${XP_PER_LEVEL}`;
+  document.getElementById('total-xp').textContent = xp.totalXp;
   const done = state.quests.filter(q => q.done).length;
   document.getElementById('complete-count').textContent = String(done).padStart(2,'0');
   document.getElementById('completed-count-label').textContent = done;
 }
 
 function renderCategories() {
-  const cats = ['ALL','MAIN','SIDE','DAILY','URGENT','RECON','BUILD'];
+  const cats = ['ALL','MAIN','SIDE','DAILY','WEEKLY','URGENT','RECON','BUILD'];
   document.getElementById('category-list').innerHTML = cats.map(c => {
     const n = c==='ALL' ? state.quests.filter(q=>!q.done).length : state.quests.filter(q=>q.category===c&&!q.done).length;
     return `<button class="cat-btn ${activeFilter===c?'active':''}" onclick="setFilter('${c}')">${c}<span class="cat-count">${n}</span></button>`;
@@ -368,12 +1153,9 @@ function questCardHTML(q) {
   let subHTML = '';
   if (q.analyzing) {
     subHTML = `<div class="subquest-container"><div class="ai-thinking">// AI ANALYZING DIRECTIVE <span class="ai-thinking-dots"></span></div></div>`;
-  } else if (hasS) {
-    subHTML = `<div class="subquest-container">
-      <div class="subquest-header">⬡ SUB-DIRECTIVES (${subDone}/${subs.length})</div>
-      <div class="sub-progress-label">${pct}% COMPLETE</div>
-      <div class="sub-progress-bar"><div class="sub-progress-fill" style="width:${pct}%"></div></div>
-      ${subs.map((s,i) => `<div class="subquest-item ${s.done?'done':''}">
+  } else {
+    const subItems = hasS ? subs.map((s,i) => `
+      <div class="subquest-item ${s.done?'done':''}">
         <div class="sub-check ${s.done?'checked':''}" onclick="toggleSub(${q.id},${i})"></div>
         <div class="sub-body">
           <div class="sub-title">${esc(s.title)}</div>
@@ -382,7 +1164,27 @@ function questCardHTML(q) {
             <span class="sub-xp">⬡ ${xpEach} XP</span>
           </div>
         </div>
-      </div>`).join('')}
+        ${!q.done?`<button class="sub-del-btn" title="Remove sub-quest" onclick="deleteSub(${q.id},${i})">✕</button>`:''}
+      </div>`).join('') : '';
+
+    subHTML = `<div class="subquest-container">
+      ${hasS ? `
+        <div class="subquest-header">⬡ SUB-DIRECTIVES (${subDone}/${subs.length})</div>
+        <div class="sub-progress-label">${pct}% COMPLETE</div>
+        <div class="sub-progress-bar"><div class="sub-progress-fill" style="width:${pct}%"></div></div>
+        ${subItems}` : ''}
+      ${!q.done ? `
+        <div class="sub-add-form" id="sub-form-${q.id}" style="display:none">
+          <input class="sub-add-input" id="sub-input-${q.id}" placeholder="Sub-quest title..." maxlength="60"
+                 onkeydown="if(event.key==='Enter')addManualSub(${q.id})">
+          <select class="sub-add-diff" id="sub-diff-${q.id}">
+            <option value="EASY">EASY</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HARD">HARD</option>
+            <option value="CRITICAL">CRITICAL</option>
+          </select>
+          <button class="sub-add-confirm" onclick="addManualSub(${q.id})">+ ADD</button>
+        </div>` : ''}
     </div>`;
   }
 
@@ -392,15 +1194,19 @@ function questCardHTML(q) {
       <div class="quest-body">
         <div class="quest-title">${esc(q.title)}</div>
         ${q.desc?`<div class="quest-desc">${esc(q.desc)}</div>`:''}
+        ${q.location?`<div class="quest-location"><a href="https://www.google.com/maps/search/${encodeURIComponent(q.location)}" target="_blank" rel="noopener" title="Open in Maps">${esc(q.location)}</a></div>`:''}
         <div class="quest-meta">
           <span class="tag tag-category">${q.category}</span>
           <span class="tag ${diffClass(q.difficulty)}">${q.difficulty}</span>
           <span class="tag tag-xp">⬡ ${q.xp} XP</span>
+          ${q.category==='DAILY'?`<span class="tag tag-daily" title="Resets at midnight — XP is kept">↺ DAILY</span>`:''}
+          ${q.category==='WEEKLY'?`<span class="tag tag-weekly" title="Resets every Monday — XP is kept">↺ WEEKLY</span>`:''}
         </div>
         ${subHTML}
       </div>
       <div class="quest-actions">
         ${!q.done?`<button class="icon-btn analyze ${q.analyzing?'analyzing':''}" title="AI Breakdown" onclick="analyzeQuest(${q.id})">⬡</button>`:''}
+        ${!q.done?`<button class="icon-btn" title="Add sub-quest manually" onclick="toggleSubForm(${q.id})">+</button>`:''}
         <button class="icon-btn del" title="Delete" onclick="deleteQuest(${q.id})">✕</button>
       </div>
     </div>
@@ -424,25 +1230,66 @@ function addQuest() {
   if (!title) { notify('// ERROR: TITLE REQUIRED','err'); return; }
   state.quests.unshift({
     id: state.nextId++, title,
-    desc: document.getElementById('quest-desc').value.trim(),
+    desc:     document.getElementById('quest-desc').value.trim(),
+    location: document.getElementById('quest-location').value.trim(),
     category: document.getElementById('quest-cat').value,
     difficulty: document.getElementById('quest-diff').value,
     xp: parseInt(document.getElementById('quest-xp').value),
     done: false, subquests: [], analyzing: false
   });
-  document.getElementById('quest-title').value = '';
-  document.getElementById('quest-desc').value = '';
-  save(); render();
+  document.getElementById('quest-title').value    = '';
+  document.getElementById('quest-desc').value     = '';
+  document.getElementById('quest-location').value = '';
+  save(); render(); syncAll();
   notify('// DIRECTIVE DEPLOYED');
+  document.dispatchEvent(new Event('questDeployed'));
+}
+
+function toggleSubForm(id) {
+  const form = document.getElementById(`sub-form-${id}`);
+  if (!form) return;
+  const visible = form.style.display !== 'none';
+  form.style.display = visible ? 'none' : 'flex';
+  if (!visible) document.getElementById(`sub-input-${id}`)?.focus();
+}
+
+function addManualSub(id) {
+  const input = document.getElementById(`sub-input-${id}`);
+  const diff  = document.getElementById(`sub-diff-${id}`);
+  if (!input) return;
+  const title = input.value.trim();
+  if (!title) { input.focus(); return; }
+  const q = state.quests.find(q => q.id === id);
+  if (!q) return;
+  q.subquests = q.subquests || [];
+  q.subquests.push({ title, difficulty: diff?.value || 'EASY', done: false });
+  input.value = '';
+  save(); render(); syncAll();
+  // Re-open the form so user can keep adding
+  const form = document.getElementById(`sub-form-${id}`);
+  if (form) { form.style.display = 'flex'; document.getElementById(`sub-input-${id}`)?.focus(); }
+}
+
+function deleteSub(questId, idx) {
+  const q = state.quests.find(q => q.id === questId);
+  if (!q) return;
+  // If sub was done, claw back its XP share before removing
+  const xpEach = Math.floor(q.xp / q.subquests.length);
+  if (q.subquests[idx]?.done) {
+    xp.totalXp   = Math.max(0, xp.totalXp   - xpEach);
+    xp.currentXp = Math.max(0, xp.currentXp - xpEach);
+  }
+  q.subquests.splice(idx, 1);
+  save(); render(); syncAll();
 }
 
 function awardXp(amount) {
-  state.totalXp += amount;
-  state.currentXp += amount;
-  while (state.currentXp >= XP_PER_LEVEL) {
-    state.currentXp -= XP_PER_LEVEL;
-    state.level++;
-    const lvl = state.level;
+  xp.totalXp += amount;
+  xp.currentXp += amount;
+  while (xp.currentXp >= XP_PER_LEVEL) {
+    xp.currentXp -= XP_PER_LEVEL;
+    xp.level++;
+    const lvl = xp.level;
     setTimeout(() => notify(`// LEVEL UP → LEVEL ${lvl}`, 'level'), 400);
   }
 }
@@ -456,10 +1303,10 @@ function toggleQuest(id) {
     awardXp(q.xp);
     notify(`// +${q.xp} XP ACQUIRED`, 'xp');
   } else {
-    state.totalXp = Math.max(0, state.totalXp - q.xp);
-    state.currentXp = Math.max(0, state.currentXp - q.xp);
+    xp.totalXp = Math.max(0, xp.totalXp - q.xp);
+    xp.currentXp = Math.max(0, xp.currentXp - q.xp);
   }
-  save(); render();
+  save(); render(); syncAll();
 }
 
 function toggleSub(questId, idx) {
@@ -472,25 +1319,24 @@ function toggleSub(questId, idx) {
     awardXp(xpEach);
     notify(`// +${xpEach} XP ACQUIRED`, 'xp');
   } else {
-    state.totalXp = Math.max(0, state.totalXp - xpEach);
-    state.currentXp = Math.max(0, state.currentXp - xpEach);
+    xp.totalXp = Math.max(0, xp.totalXp - xpEach);
+    xp.currentXp = Math.max(0, xp.currentXp - xpEach);
   }
-  // Auto-complete parent
   if (q.subquests.every(s => s.done)) {
     q.done = true;
     setTimeout(() => notify('// DIRECTIVE COMPLETE — ALL OBJECTIVES MET', 'level'), 300);
   }
-  save(); render();
+  save(); render(); syncAll();
 }
 
 function deleteQuest(id) {
   const q = state.quests.find(q => q.id===id);
   if (q && q.done) {
-    state.totalXp = Math.max(0, state.totalXp - q.xp);
-    state.currentXp = Math.max(0, state.currentXp - q.xp);
+    xp.totalXp = Math.max(0, xp.totalXp - q.xp);
+    xp.currentXp = Math.max(0, xp.currentXp - q.xp);
   }
   state.quests = state.quests.filter(q => q.id!==id);
-  save(); render();
+  save(); render(); syncAll();
   notify('// DIRECTIVE TERMINATED');
 }
 
@@ -506,44 +1352,45 @@ function setSort(mode) {
 async function analyzeQuest(id) {
   const q = state.quests.find(q => q.id===id);
   if (!q || q.analyzing) return;
+
+  if (!serverOnline) {
+    notify('// SERVER OFFLINE — START server.py FIRST', 'err');
+    return;
+  }
+
   q.analyzing = true; q.subquests = [];
   save(); render();
   notify('// AI ANALYZING DIRECTIVE...', 'ai');
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(`${SERVER_BASE}/api/analyze`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content:
-          `You are a tactical mission planner. Break down this quest into 3-5 actionable sub-quests.
-
-Quest: "${q.title}"
-Description: "${q.desc || 'None'}"
-Category: ${q.category} | Priority: ${q.difficulty}
-
-Respond ONLY with a valid JSON array, no markdown, no explanation:
-[{"title":"Sub-quest title","difficulty":"EASY"},{"title":"Another task","difficulty":"MEDIUM"}]
-
-Rules: 3-5 sub-quests, title max 60 chars, difficulty must be EASY/MEDIUM/HARD/CRITICAL, be specific and actionable.`
-        }]
-      })
+      headers: authHeaders(),
+      body: JSON.stringify({ title: q.title, desc: q.desc||'None', category: q.category, difficulty: q.difficulty })
     });
 
     const data = await res.json();
-    const raw = (data.content||[]).map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim();
-    const subs = JSON.parse(raw);
+    if (res.status === 503) throw new Error('NO AI BACKEND — SET API KEY OR START OLLAMA');
+    if (res.status === 401) { logout(); return; }
+    if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
+
+    const subs = data.subquests;
     if (!Array.isArray(subs) || !subs.length) throw new Error('bad response');
-    q.subquests = subs.slice(0,5).map(s => ({ title: String(s.title).slice(0,60), difficulty: s.difficulty||'EASY', done: false }));
+
+    q.subquests = subs.slice(0,5).map(s => ({
+      title: String(s.title).slice(0,60), difficulty: s.difficulty||'EASY', done: false
+    }));
     q.analyzing = false;
-    save(); render();
-    notify(`// ${q.subquests.length} SUB-DIRECTIVES GENERATED`, 'ai');
+
+    const src = data.source || 'unknown';
+    const srcLabel = src === 'claude' ? 'CLAUDE' : src.startsWith('ollama') ? 'LOCAL AI (HAILO)' : src.toUpperCase();
+    save(); render(); syncAll();
+    notify(`// ${q.subquests.length} SUB-DIRECTIVES GENERATED via ${srcLabel}`, 'ai');
+
   } catch(err) {
     q.analyzing = false;
     save(); render();
-    notify('// AI ANALYSIS FAILED — CHECK CONNECTION', 'err');
+    notify(`// AI FAILED — ${err.message}`, 'err');
     console.error(err);
   }
 }
@@ -562,9 +1409,38 @@ function notify(msg, type='') {
   notifTimer = setTimeout(() => el.remove(), 2600);
 }
 
+function copyUrl(el, path) {
+  navigator.clipboard.writeText(`${SERVER_BASE}${path}`).then(() => {
+    const hint = el.querySelector('.copy-hint');
+    hint.textContent = 'COPIED!';
+    setTimeout(() => hint.textContent = 'COPY', 1500);
+  });
+}
+
 document.getElementById('quest-title').addEventListener('keydown', e => { if(e.key==='Enter') addQuest(); });
 
-render();
+// ── MOBILE SIDEBAR ───────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const btn     = document.getElementById('mobile-menu-btn');
+  const isOpen  = sidebar.classList.toggle('open');
+  overlay.classList.toggle('active', isOpen);
+  btn.textContent = isOpen ? '✕' : '☰';
+}
+function closeSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const btn     = document.getElementById('mobile-menu-btn');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('active');
+  btn.textContent = '☰';
+}
+// Close sidebar after deploying a quest on mobile
+const _origAddQuest = addQuest;
+// Close sidebar after deploying on mobile
+document.addEventListener('questDeployed', closeSidebar);
 </script>
+<script src="friends.js"></script>
 </body>
 </html>

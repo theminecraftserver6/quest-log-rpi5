@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Chronicle of Deeds</title>
+<title>Beta Quest — The Chronicle of Deeds</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap');
 
@@ -255,6 +255,12 @@
   }
 
   .panel-title::before { content: '⚜'; font-size: .7rem; color: var(--gold); }
+  .panel-title.collapsible { cursor:pointer; user-select:none; justify-content:space-between; margin-bottom:0; }
+  .panel-title.collapsible:hover { color: var(--gold); }
+  .collapse-chevron { font-size:.65rem; opacity:.5; transition:transform .2s; margin-left:auto; flex-shrink:0; }
+  .collapse-chevron.closed { transform:rotate(-90deg); }
+  .panel-body { overflow:hidden; transition:max-height .25s ease, opacity .2s ease, padding .2s ease; padding-top:12px; }
+  .panel-body.collapsed { max-height:0 !important; opacity:0; pointer-events:none; padding-top:0; }
 
   /* ═══════════════════════════════════════
      CATEGORY FILTER
@@ -1110,7 +1116,7 @@
 <!-- ── AUTH OVERLAY ─────────────────────────────────────── -->
 <div class="auth-overlay" id="auth-overlay">
   <div class="auth-box">
-    <div class="auth-logo">The Chronicle of Deeds</div>
+    <div class="auth-logo">Beta Quest</div>
     <div class="auth-sub">✦ &nbsp; Identify Thyself, Adventurer &nbsp; ✦</div>
     <div class="auth-rule">— ✦ —</div>
     <div class="auth-tabs">
@@ -1144,7 +1150,7 @@
   <header class="header">
     <div class="header-inner">
       <div style="display:flex;flex-direction:column;gap:6px">
-        <div class="logo">The Chronicle of Deeds</div>
+        <div class="logo">Beta Quest</div>
         <span class="logo-sub">✦ &nbsp; Royal Registry of Adventurers &nbsp; ✦</span>
         <div class="auth-user-bar">
           <span class="auth-username" id="header-username"></span>
@@ -1187,96 +1193,104 @@
 
       <!-- Category Filter -->
       <div class="panel">
-        <div class="panel-title">Filter by Guild</div>
-        <div class="category-list" id="category-list"></div>
+        <div class="panel-title collapsible" onclick="togglePanel('filter')">Filter by Guild<span class="collapse-chevron" id="chev-filter">▾</span></div>
+        <div class="panel-body" id="body-filter">
+          <div class="category-list" id="category-list"></div>
+        </div>
       </div>
 
       <!-- API Panel -->
       <div class="panel api-panel">
-        <div class="panel-title">Arcane Conduit</div>
-        <div class="api-row">
-          <span class="api-label">Glory Scroll</span>
-          <div class="api-url" onclick="copyUrl(this, '/api/xp')">
-            <span id="api-xp-url">http://localhost:8080/api/xp</span>
-            <span class="copy-hint">COPY</span>
+        <div class="panel-title collapsible" onclick="togglePanel('api')">Arcane Conduit<span class="collapse-chevron" id="chev-api">▾</span></div>
+        <div class="panel-body" id="body-api">
+          <div class="api-row">
+            <span class="api-label">Glory Scroll</span>
+            <div class="api-url" onclick="copyUrl(this, '/api/xp')">
+              <span id="api-xp-url">http://localhost:8080/api/xp</span>
+              <span class="copy-hint">COPY</span>
+            </div>
           </div>
-        </div>
-        <div class="api-row">
-          <span class="api-label">Quest Registry</span>
-          <div class="api-url" onclick="copyUrl(this, '/api/quests')">
-            <span id="api-quests-url">http://localhost:8080/api/quests</span>
-            <span class="copy-hint">COPY</span>
+          <div class="api-row">
+            <span class="api-label">Quest Registry</span>
+            <div class="api-url" onclick="copyUrl(this, '/api/quests')">
+              <span id="api-quests-url">http://localhost:8080/api/quests</span>
+              <span class="copy-hint">COPY</span>
+            </div>
           </div>
-        </div>
-        <div class="api-divider"></div>
-        <div class="api-note">
-          Both tomes support <code>GET</code>.<br>
-          The Glory Scroll updates when quests change.<br>
-          Data is also inscribed to <code>xp_state.json</code>.
+          <div class="api-divider"></div>
+          <div class="api-note">
+            Both tomes support <code>GET</code>.<br>
+            The Glory Scroll updates when quests change.<br>
+            Data is also inscribed to <code>xp_state.json</code>.
+          </div>
         </div>
       </div>
 
       <!-- New Quest Form -->
       <div class="panel">
-        <div class="panel-title">Post a New Quest</div>
-        <div class="form-group">
-          <label class="form-label">Quest Title *</label>
-          <input class="form-input" id="quest-title" placeholder="Name thy deed..." maxlength="60">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Description</label>
-          <textarea class="form-textarea form-input" id="quest-desc" placeholder="Speak of the task..."></textarea>
-        </div>
-        <div class="form-row">
+        <div class="panel-title collapsible" onclick="togglePanel('newquest')">Post a New Quest<span class="collapse-chevron" id="chev-newquest">▾</span></div>
+        <div class="panel-body" id="body-newquest">
           <div class="form-group">
-            <label class="form-label">Guild</label>
-            <select class="form-select" id="quest-cat">
-              <option>MAIN</option>
-              <option>SIDE</option>
-              <option>DAILY</option>
-              <option>WEEKLY</option>
-              <option>URGENT</option>
-              <option>RECON</option>
-              <option>BUILD</option>
+            <label class="form-label">Quest Title *</label>
+            <input class="form-input" id="quest-title" placeholder="Name thy deed..." maxlength="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea form-input" id="quest-desc" placeholder="Speak of the task..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Guild</label>
+              <select class="form-select" id="quest-cat">
+                <option>MAIN</option>
+                <option>SIDE</option>
+                <option>DAILY</option>
+                <option>WEEKLY</option>
+                <option>URGENT</option>
+                <option>RECON</option>
+                <option>BUILD</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Peril</label>
+              <select class="form-select" id="quest-diff">
+                <option>EASY</option>
+                <option>MEDIUM</option>
+                <option>HARD</option>
+                <option>CRITICAL</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Glory Reward</label>
+            <select class="form-select" id="quest-xp">
+              <option value="10">10 — Petty Deed</option>
+              <option value="25">25 — Common Deed</option>
+              <option value="50">50 — Noble Deed</option>
+              <option value="100">100 — Heroic Deed</option>
+              <option value="200">200 — Legendary Deed</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Peril</label>
-            <select class="form-select" id="quest-diff">
-              <option>EASY</option>
-              <option>MEDIUM</option>
-              <option>HARD</option>
-              <option>CRITICAL</option>
-            </select>
+            <label class="form-label">📍 Location <span style="color:var(--text-faint);font-size:.75em;font-style:italic">(optional)</span></label>
+            <input class="form-input" id="quest-location" placeholder="Where must thou venture?" maxlength="80">
           </div>
+          <button class="coop-toggle-btn" onclick="toggleCoopMode()">⚔ Toggle Fellowship Quest</button>
+          <div id="coop-form-wrap">
+            <div class="form-label" style="margin-bottom:6px;color:var(--crimson)">Fellows &amp; Glory Shares</div>
+            <div id="coop-form-area" class="coop-form-area"></div>
+            <button class="btn-add" id="coop-deploy-btn" style="display:none;background:rgba(139,26,26,.08);border-color:var(--crimson2);color:var(--crimson)" onclick="createCoopQuest()">⚔ Post Fellowship Quest</button>
+          </div>
+          <button class="btn-add" id="solo-deploy-btn" onclick="addQuest()">⚜ Post to the Board</button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Glory Reward</label>
-          <select class="form-select" id="quest-xp">
-            <option value="10">10 — Petty Deed</option>
-            <option value="25">25 — Common Deed</option>
-            <option value="50">50 — Noble Deed</option>
-            <option value="100">100 — Heroic Deed</option>
-            <option value="200">200 — Legendary Deed</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">📍 Location <span style="color:var(--text-faint);font-size:.75em;font-style:italic">(optional)</span></label>
-          <input class="form-input" id="quest-location" placeholder="Where must thou venture?" maxlength="80">
-        </div>
-        <button class="coop-toggle-btn" onclick="toggleCoopMode()">⚔ Toggle Fellowship Quest</button>
-        <div id="coop-form-wrap">
-          <div class="form-label" style="margin-bottom:6px;color:var(--crimson)">Fellows &amp; Glory Shares</div>
-          <div id="coop-form-area" class="coop-form-area"></div>
-          <button class="btn-add" id="coop-deploy-btn" style="display:none;background:rgba(139,26,26,.08);border-color:var(--crimson2);color:var(--crimson)" onclick="createCoopQuest()">⚔ Post Fellowship Quest</button>
-        </div>
-        <button class="btn-add" id="solo-deploy-btn" onclick="addQuest()">⚜ Post to the Board</button>
       </div>
 
       <!-- Fellows Panel -->
       <div class="panel">
-        <div class="panel-title">⚔ Fellowship</div>
-        <div id="friends-panel-body"></div>
+        <div class="panel-title collapsible" onclick="togglePanel('friends')">⚔ Fellowship<span class="collapse-chevron" id="chev-friends">▾</span></div>
+        <div class="panel-body" id="body-friends">
+          <div id="friends-panel-body"></div>
+        </div>
       </div>
     </aside>
 
@@ -1297,14 +1311,18 @@
 
       <!-- Co-op Quests -->
       <div class="completed-panel" style="border-left-color:var(--crimson);margin-top:10px">
-        <div class="panel-title" style="color:var(--crimson)">⚔ Fellowship Quests</div>
-        <div class="coop-section"><div id="coop-list"><div class="coop-empty">No fellowship quests yet.</div></div></div>
+        <div class="panel-title collapsible" style="color:var(--crimson)" onclick="togglePanel('coop')">⚔ Fellowship Quests<span class="collapse-chevron" id="chev-coop">▾</span></div>
+        <div class="panel-body" id="body-coop">
+          <div class="coop-section"><div id="coop-list"><div class="coop-empty">No fellowship quests yet.</div></div></div>
+        </div>
       </div>
 
       <!-- Completed -->
       <div class="completed-panel">
-        <div class="panel-title">Deeds of Legend — <span id="completed-count-label">0</span> completed</div>
-        <div class="quest-list" id="completed-list"></div>
+        <div class="panel-title collapsible" onclick="togglePanel('completed')">Deeds of Legend — <span id="completed-count-label">0</span> completed<span class="collapse-chevron" id="chev-completed">▾</span></div>
+        <div class="panel-body" id="body-completed">
+          <div class="quest-list" id="completed-list"></div>
+        </div>
       </div>
     </section>
 
@@ -1389,6 +1407,7 @@ async function logout() {
     await fetch(`${SERVER_BASE}/api/logout`, { method:'POST', headers: authHeaders() });
   } catch(e){}
   authToken = null; authUsername = null;
+  if (typeof _pollTimer !== 'undefined') clearTimeout(_pollTimer); // stop poll loop
   localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);
   xp    = { level:1, currentXp:0, totalXp:0 };
   state = { quests:[], nextId:1, lastDailyReset: null, lastWeeklyReset: null };
@@ -1538,6 +1557,7 @@ async function initApp() {
   runDailyReset();
   runWeeklyReset();
   render();
+  initPanels();
   checkServer();
   setInterval(checkServer, 15000);
   scheduleNextMidnight();
@@ -1581,7 +1601,68 @@ setInterval(() => {
 }, 1000);
 
 // ── Render ────────────────────────────────────────────────────────────────────
-function render() { renderStats(); renderCategories(); renderQuests(); }
+// ── Collapsible Panels ────────────────────────────────────────────────────────
+const COLLAPSE_KEY = 'questlog_fantasy_collapsed';
+const PANELS = ['filter','api','newquest','friends','coop','completed'];
+
+function _collapseState() {
+  try { return JSON.parse(localStorage.getItem(COLLAPSE_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function togglePanel(id) {
+  const body = document.getElementById(`body-${id}`);
+  const chev = document.getElementById(`chev-${id}`);
+  if (!body) return;
+  const isOpen = !body.classList.contains('collapsed');
+  if (isOpen) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      body.classList.add('collapsed');
+      body.style.maxHeight = '0px';
+    });
+  } else {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = 'none';
+  }
+  if (chev) chev.classList.toggle('closed', isOpen);
+  const s = _collapseState();
+  s[id] = isOpen;
+  localStorage.setItem(COLLAPSE_KEY, JSON.stringify(s));
+}
+
+function refreshPanelHeight(id) {
+  const body = document.getElementById(`body-${id}`);
+  if (body && !body.classList.contains('collapsed')) {
+    body.style.maxHeight = 'none';
+    requestAnimationFrame(() => { body.style.maxHeight = body.scrollHeight + 'px'; });
+  }
+}
+
+function initPanels() {
+  const s = _collapseState();
+  PANELS.forEach(id => {
+    const body = document.getElementById(`body-${id}`);
+    const chev = document.getElementById(`chev-${id}`);
+    if (!body) return;
+    if (s[id]) {
+      body.style.maxHeight = '0px';
+      body.classList.add('collapsed');
+      if (chev) chev.classList.add('closed');
+    } else {
+      body.style.maxHeight = 'none';
+    }
+  });
+}
+
+function render() {
+  renderStats(); renderCategories(); renderQuests();
+  requestAnimationFrame(() => {
+    PANELS.forEach(id => {
+      const body = document.getElementById(`body-${id}`);
+      if (body && !body.classList.contains('collapsed')) body.style.maxHeight = body.scrollHeight + 'px';
+    });
+  });
+}
 
 function renderStats() {
   document.getElementById('level-display').textContent = toRoman(xp.level);
